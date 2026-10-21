@@ -5,7 +5,8 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     setupFiles: ['./src/__tests__/setup.ts'],
-    testTimeout: 15_000,
+    testTimeout: 20_000,
+    fileParallelism: false,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'lcov'],

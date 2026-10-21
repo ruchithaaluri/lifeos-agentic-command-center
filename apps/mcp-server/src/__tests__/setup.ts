@@ -16,7 +16,3 @@ beforeAll(async () => {
     console.warn('DB not available — DB-dependent tests will be skipped');
   }
 });
-
-afterAll(async () => {
-  await prisma.$disconnect();
-});
