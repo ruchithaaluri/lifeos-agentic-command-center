@@ -133,14 +133,18 @@ describe('Scheduling Regression Tests', () => {
     expect(demoEvent).toBeDefined();
     if (!demoEvent) throw new Error('demoEvent not found');
 
-    const demoStartStr = demoEvent.start.toLocaleTimeString('en-US', {
-      timeZone: TIMEZONE,
-      hour12: false,
-    });
-    const demoEndStr = demoEvent.end.toLocaleTimeString('en-US', {
-      timeZone: TIMEZONE,
-      hour12: false,
-    });
+    const demoStartStr = demoEvent.start
+      .toLocaleTimeString('en-US', {
+        timeZone: TIMEZONE,
+        hourCycle: 'h23',
+      })
+      .replace(/\s+/g, ' ');
+    const demoEndStr = demoEvent.end
+      .toLocaleTimeString('en-US', {
+        timeZone: TIMEZONE,
+        hourCycle: 'h23',
+      })
+      .replace(/\s+/g, ' ');
 
     // Ensure it falls within evening window (18:00 - 22:30) and NOT 00:00 (12:00 AM)
     expect(demoEvent.start.getTime()).toBeLessThan(
@@ -149,8 +153,8 @@ describe('Scheduling Regression Tests', () => {
     expect(demoEvent.start.getTime()).toBeGreaterThanOrEqual(
       getLocalDate(TARGET_DATE, '18:00:00', TIMEZONE).getTime(),
     );
-    expect(demoStartStr).not.toBe('00:00:00');
-    expect(demoEndStr).not.toBe('00:00:00');
+    expect(demoStartStr).not.toMatch(/^(00|24):00:00$/);
+    expect(demoEndStr).not.toMatch(/^(00|24):00:00$/);
 
     // Total new work planned: Demo practice event (30m) + Task (30m) = 60m
     const planDuration = planOutput.plan.items
@@ -278,13 +282,15 @@ describe('Scheduling Regression Tests', () => {
     if (!payload) throw new Error('payload not found');
 
     const startTime = new Date(payload.start);
-    const timeInZone = startTime.toLocaleTimeString('en-US', {
-      timeZone: TIMEZONE,
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-    expect(timeInZone).toBe('00:30');
+    const timeInZone = startTime
+      .toLocaleTimeString('en-US', {
+        timeZone: TIMEZONE,
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23',
+      })
+      .replace(/\s+/g, ' ');
+    expect(['00:30', '24:30']).toContain(timeInZone);
   });
 
   it('5. Planner avoids overlapping existing evening events', async () => {
@@ -514,12 +520,14 @@ describe('Scheduling Regression Tests', () => {
     expect(newStartStr).toBeDefined();
     if (!newStartStr) throw new Error('newStartStr is required');
     const newStartDate = new Date(newStartStr);
-    const timeFormatted = newStartDate.toLocaleTimeString('en-US', {
-      timeZone: TIMEZONE,
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
+    const timeFormatted = newStartDate
+      .toLocaleTimeString('en-US', {
+        timeZone: TIMEZONE,
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23',
+      })
+      .replace(/\s+/g, ' ');
     expect(timeFormatted).toBe('20:00');
 
     // 3. ZERO tasks in changesRequired (no update_task or create_task)
@@ -542,12 +550,14 @@ describe('Scheduling Regression Tests', () => {
     expect(updatedEvent).toBeDefined();
     if (!updatedEvent) throw new Error('updatedEvent is required');
     expect(
-      updatedEvent.start.toLocaleTimeString('en-US', {
-        timeZone: TIMEZONE,
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      }),
+      updatedEvent.start
+        .toLocaleTimeString('en-US', {
+          timeZone: TIMEZONE,
+          hour: '2-digit',
+          minute: '2-digit',
+          hourCycle: 'h23',
+        })
+        .replace(/\s+/g, ' '),
     ).toBe('20:00');
 
     const tasksAfter = await prisma.task.findMany({ where: { userId: TEST_USER_ID } });

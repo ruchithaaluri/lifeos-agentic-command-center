@@ -195,7 +195,7 @@ jobs:
           AI_PROVIDER: rule-based
 
       - name: Run MCP Server scheduling regression tests
-        run: pnpm --filter @lifeos/mcp-server exec vitest run src/__tests__/scheduling-regression.test.ts
+        run: pnpm --filter @lifeos/mcp-server exec vitest run src/__tests__/scheduling-regression.test.ts --reporter=verbose
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lifeos_test
           MCP_SECRET: test-secret-for-ci
