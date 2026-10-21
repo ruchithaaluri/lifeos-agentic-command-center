@@ -175,8 +175,17 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lifeos_test
       
-      - name: Run tests
-        run: pnpm test
+      - name: Run shared tests
+        run: pnpm --filter @lifeos/shared test
+      
+      - name: Run AI tests
+        run: pnpm --filter @lifeos/ai test
+
+      - name: Run Web tests
+        run: pnpm --filter @lifeos/web test
+
+      - name: Run MCP Server tests
+        run: pnpm --filter @lifeos/mcp-server test
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lifeos_test
           MCP_SECRET: test-secret-for-ci
