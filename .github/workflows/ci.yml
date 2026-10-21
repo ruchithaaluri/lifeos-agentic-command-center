@@ -1,0 +1,346 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # Linting and formatting check
+  lint:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+      
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      # ESLint runs with parserOptions.project, so it type-checks using each
+      # package tsconfig. Workspace packages are consumed through their
+      # "main"/"types" entry points, which point at dist/. On a fresh checkout
+      # dist/ does not exist, so every cross-package import resolves to an
+      # error type and the type-aware rules report a cascade of
+      # no-unsafe-assignment / no-unsafe-member-access failures that are not
+      # real lint problems. Build the packages first, exactly as the
+      # TypeScript job does.
+      - name: Build workspace packages
+        run: |
+          pnpm --filter @lifeos/shared build
+          pnpm --filter @lifeos/database build
+          pnpm --filter @lifeos/ai build
+          pnpm --filter @lifeos/ui build
+
+      - name: Run ESLint
+        run: pnpm lint
+      
+      - name: Check formatting (Prettier)
+        run: pnpm format:check || echo "Add format:check script to package.json"
+
+  # Type checking
+  typecheck:
+    name: TypeScript Type Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+      
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build shared packages
+        run: |
+          pnpm --filter @lifeos/shared build
+          pnpm --filter @lifeos/database build
+          pnpm --filter @lifeos/ai build
+          pnpm --filter @lifeos/ui build
+      
+      - name: Run TypeScript compiler
+        run: pnpm typecheck
+
+  # Unit tests
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+      
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build packages
+        run: |
+          pnpm --filter @lifeos/shared build
+          pnpm --filter @lifeos/database build
+          pnpm --filter @lifeos/ai build
+      
+      - name: Run tests
+        run: pnpm test
+      
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v5
+        if: always()
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unittests
+          name: codecov-umbrella
+
+  # Build verification
+  build:
+    name: Build All Packages
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+      
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build all packages and apps
+        run: pnpm build
+        env:
+          # Provide minimal env vars needed for build
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lifeos_test
+          MCP_SECRET: test-secret-for-ci-build-only
+          MCP_SERVER_URL: http://localhost:3001
+          NEXTAUTH_URL: http://localhost:3000
+          NEXTAUTH_SECRET: test-secret-for-ci
+      
+      - name: Check build artifacts
+        run: |
+          ls -la packages/shared/dist/
+          ls -la packages/database/dist/
+          ls -la packages/ai/dist/
+          ls -la apps/mcp-server/dist/
+          ls -la apps/web/.next/
+
+  # Database integration tests (with PostgreSQL service)
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: lifeos_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+      
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build packages
+        run: |
+          pnpm --filter @lifeos/shared build
+          pnpm --filter @lifeos/database build
+          pnpm --filter @lifeos/ai build
+      
+      - name: Run database migrations
+        run: pnpm --filter @lifeos/database db:migrate:deploy
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lifeos_test
+      
+      - name: Seed test data
+        run: pnpm --filter @lifeos/database db:seed
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lifeos_test
+      
+      - name: Run integration tests
+        run: pnpm test:integration || echo "Add integration tests"
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lifeos_test
+          MCP_SECRET: test-secret-for-ci
+          AI_PROVIDER: rule-based
+
+  # Security audit
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+      
+      - name: Run npm audit
+        run: pnpm audit --audit-level=high
+        continue-on-error: true
+      
+      - name: Check for known vulnerabilities
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm audit --json > audit-report.json || true
+      
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-audit-report
+          path: audit-report.json
+
+  # Dependency validation
+  deps:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+      
+      - name: Validate lockfile
+        run: |
+          if [ ! -f "pnpm-lock.yaml" ]; then
+            echo "Error: pnpm-lock.yaml not found"
+            exit 1
+          fi
+      
+      - name: Check for outdated dependencies
+        run: pnpm outdated || true
+      
+      - name: Verify workspace structure
+        run: |
+          pnpm list --depth 0
+          pnpm list --filter @lifeos/shared --depth 0
+          pnpm list --filter @lifeos/database --depth 0
+          pnpm list --filter @lifeos/ai --depth 0
+          pnpm list --filter @lifeos/mcp-server --depth 0
+          pnpm list --filter @lifeos/web --depth 0

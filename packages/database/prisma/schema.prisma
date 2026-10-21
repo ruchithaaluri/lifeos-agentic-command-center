@@ -1,0 +1,191 @@
+// ============================================================
+// LifeOS — Prisma Schema
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── User ──────────────────────────────────────────────────────────────────
+
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  name       String
+  avatarUrl  String?  @map("avatar_url")
+  demoMode   Boolean  @default(false) @map("demo_mode")
+  timezone   String   @default("America/Los_Angeles")
+  /// scrypt hash (salt:hash, hex). Null for demo/OAuth-only accounts.
+  passwordHash String? @map("password_hash")
+  /// Set once the starter workspace has been provisioned. Doubles as the
+  /// onboarding marker so provisioning stays idempotent.
+  onboardedAt DateTime? @map("onboarded_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  projects       Project[]
+  tasks          Task[]
+  calendarEvents CalendarEvent[]
+  agentSessions  AgentSession[]
+
+  @@map("users")
+}
+
+// ── Project ───────────────────────────────────────────────────────────────
+
+model Project {
+  id          String        @id @default(uuid())
+  userId      String        @map("user_id")
+  name        String
+  description String?
+  status      ProjectStatus @default(active)
+  color       String        @default("#3B82F6")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks  Task[]
+  events CalendarEvent[]
+
+  @@index([userId])
+  @@map("projects")
+}
+
+enum ProjectStatus {
+  active
+  on_hold
+  completed
+  archived
+}
+
+// ── Task ──────────────────────────────────────────────────────────────────
+
+model Task {
+  id               String       @id @default(uuid())
+  userId           String       @map("user_id")
+  projectId        String?      @map("project_id")
+  title            String
+  description      String?
+  status           TaskStatus   @default(todo)
+  priority         TaskPriority @default(medium)
+  dueDate          DateTime?    @map("due_date")
+  estimatedMinutes Int?         @map("estimated_minutes")
+  completedAt      DateTime?    @map("completed_at")
+  deletedAt        DateTime?    @map("deleted_at")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  events  CalendarEvent[]
+
+  @@index([userId])
+  @@index([userId, status])
+  @@index([userId, priority])
+  @@index([dueDate])
+  @@map("tasks")
+}
+
+enum TaskStatus {
+  todo
+  in_progress
+  completed
+  cancelled
+}
+
+enum TaskPriority {
+  low
+  medium
+  high
+  urgent
+}
+
+// ── Calendar Event ────────────────────────────────────────────────────────
+
+model CalendarEvent {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  title       String
+  description String?
+  start       DateTime
+  end         DateTime
+  type        EventType @default(meeting)
+  location    String?
+  isAllDay    Boolean   @default(false) @map("is_all_day")
+  projectId   String?   @map("project_id")
+  taskId      String?   @map("task_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  task    Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([userId, start])
+  @@map("calendar_events")
+}
+
+enum EventType {
+  meeting
+  focus
+  break
+  deadline
+  reminder
+  personal
+}
+
+// ── Agent Session ─────────────────────────────────────────────────────────
+
+model AgentSession {
+  id        String              @id @default(uuid())
+  userId    String              @map("user_id")
+  goal      String
+  status    AgentSessionStatus  @default(active)
+  plan      Json?
+  createdAt DateTime            @default(now()) @map("created_at")
+  updatedAt DateTime            @updatedAt @map("updated_at")
+
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actions AgentAction[]
+
+  @@index([userId])
+  @@map("agent_sessions")
+}
+
+enum AgentSessionStatus {
+  active
+  completed
+  failed
+}
+
+// ── Agent Action ──────────────────────────────────────────────────────────
+
+model AgentAction {
+  id        String            @id @default(uuid())
+  sessionId String            @map("session_id")
+  tool      String
+  input     Json
+  output    Json?
+  status    AgentActionStatus @default(pending)
+  message   String
+  latencyMs Int?              @map("latency_ms")
+  createdAt DateTime          @default(now()) @map("created_at")
+
+  session AgentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@map("agent_actions")
+}
+
+enum AgentActionStatus {
+  pending
+  running
+  success
+  failed
+}

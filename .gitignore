@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+.next/
+.turbo/
+out/
+build/
+
+# Environment files — NEVER commit secrets
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Database
+*.db
+*.sqlite
+.pgdata/
+
+# Prisma
+# Migration history is intentionally committed so that `prisma migrate deploy`
+# can build a database from scratch in CI and in any environment. Generated
+# client output lives in node_modules and is not committed.
+apps/web/prisma/migrations/
+!packages/database/prisma/migrations/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+.idea/
+
+# Test outputs
+coverage/
+playwright-report/
+test-results/
+
+# Misc
+*.tsbuildinfo
+.vercel
