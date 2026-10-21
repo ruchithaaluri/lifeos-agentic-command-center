@@ -6,7 +6,7 @@ describe('Timezone formatting & date shifts', () => {
     // 2026-10-19 14:00:00 UTC = 7:00 AM PDT (UTC-7)
     const utcIso = '2026-10-19T14:00:00.000Z';
     const formatted = formatTime(utcIso, 'America/Los_Angeles');
-    expect(formatted).toBe('7:00 AM');
+    expect(formatted.replace(/\s+/g, ' ')).toBe('7:00 AM');
   });
 
   it('formats date correctly across UTC day boundaries with user timezone', () => {

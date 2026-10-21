@@ -6,21 +6,25 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatTime(date: Date | string, timeZone?: string): string {
-  return new Date(date).toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-    ...(timeZone ? { timeZone } : {}),
-  });
+  return new Date(date)
+    .toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+      ...(timeZone ? { timeZone } : {}),
+    })
+    .replace(/\s+/g, ' ');
 }
 
 export function formatDate(date: Date | string, timeZone?: string): string {
-  return new Date(date).toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    ...(timeZone ? { timeZone } : {}),
-  });
+  return new Date(date)
+    .toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      ...(timeZone ? { timeZone } : {}),
+    })
+    .replace(/\s+/g, ' ');
 }
 
 export function formatRelative(date: Date | string): string {
