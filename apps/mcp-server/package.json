@@ -11,7 +11,7 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "lint": "eslint src --ext .ts",
-    "test": "vitest run",
+    "test": "vitest run --exclude **/mcp-integration.test.ts",
     "test:watch": "vitest",
     "test:integration": "vitest run src/__tests__/mcp-integration.test.ts",
     "clean": "rm -rf dist"
