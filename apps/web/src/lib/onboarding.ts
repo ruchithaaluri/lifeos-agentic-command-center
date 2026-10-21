@@ -87,8 +87,7 @@ export async function ensureWorkspaceInitialized(userId: string): Promise<Onboar
           userId,
           projectId,
           title: 'Review your first plan',
-          description:
-            'Ask LifeOS to plan your day, then review the plan it streams back.',
+          description: 'Ask LifeOS to plan your day, then review the plan it streams back.',
           status: 'todo',
           priority: 'high',
           dueDate: daysFromNow(0, 11, 0, tz),

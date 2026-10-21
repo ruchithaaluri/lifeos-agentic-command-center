@@ -25,14 +25,16 @@ export function EventCard({ event, className, onRefresh }: EventCardProps) {
     <>
       <div
         className={cn(
-          'group border-white/8 relative flex items-start gap-3 rounded-lg border p-3 transition-all hover:border-white/20 hover:bg-white/[0.03]',
+          'border-white/8 group relative flex items-start gap-3 rounded-lg border p-3 transition-all hover:border-white/20 hover:bg-white/[0.03]',
           isPast && 'opacity-50',
           className,
         )}
       >
         {/* Time block */}
         <div className="shrink-0 text-right">
-          <div className="text-xs font-semibold text-slate-200">{formatTime(event.start, timezone)}</div>
+          <div className="text-xs font-semibold text-slate-200">
+            {formatTime(event.start, timezone)}
+          </div>
           <div className="text-xs text-slate-500">{formatTime(event.end, timezone)}</div>
         </div>
 
@@ -46,7 +48,7 @@ export function EventCard({ event, className, onRefresh }: EventCardProps) {
             <button
               type="button"
               onClick={() => setShowEdit(true)}
-              className="rounded p-1 text-slate-500 opacity-0 transition-opacity hover:bg-white/10 hover:text-violet-300 group-hover:opacity-100 focus:opacity-100"
+              className="rounded p-1 text-slate-500 opacity-0 transition-opacity hover:bg-white/10 hover:text-violet-300 focus:opacity-100 group-hover:opacity-100"
               aria-label="Edit event time"
               title="Edit event time"
             >

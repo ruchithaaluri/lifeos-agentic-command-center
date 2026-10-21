@@ -34,7 +34,12 @@ const loginEmailLimiter = new FixedWindowRateLimiter(LOGIN_LIMIT_EMAIL, LOGIN_WI
 
 const tooMany = (retryAfter: number) =>
   NextResponse.json(
-    { error: { code: 'RATE_LIMITED', message: 'Too many sign-in attempts. Please try again later.' } },
+    {
+      error: {
+        code: 'RATE_LIMITED',
+        message: 'Too many sign-in attempts. Please try again later.',
+      },
+    },
     {
       status: 429,
       headers: { 'Retry-After': String(retryAfter), 'X-RateLimit-Remaining': '0' },

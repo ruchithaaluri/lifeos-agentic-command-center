@@ -150,19 +150,15 @@ function ActivityInner() {
 
   // If agent is currently running live in this session, show live state; otherwise show persisted records
   const isViewingLiveSession =
-    (isRunning || (liveSessionId && selectedSessionId === liveSessionId)) &&
-    liveActions.length > 0;
+    (isRunning || (liveSessionId && selectedSessionId === liveSessionId)) && liveActions.length > 0;
   const displayGoal = isViewingLiveSession ? liveGoal : currentSession?.goal;
   const displayActions =
-    persistedActions.length > 0
-      ? persistedActions
-      : isViewingLiveSession
-        ? liveActions
-        : [];
+    persistedActions.length > 0 ? persistedActions : isViewingLiveSession ? liveActions : [];
 
-  const sessionStatus = isViewingLiveSession && isRunning
-    ? 'running'
-    : currentSession?.status ?? (liveError ? 'failed' : 'completed');
+  const sessionStatus =
+    isViewingLiveSession && isRunning
+      ? 'running'
+      : (currentSession?.status ?? (liveError ? 'failed' : 'completed'));
 
   return (
     <AppShell>

@@ -52,8 +52,13 @@ async function runE2E() {
   // ── Step 2: Sign in via NextAuth ──
   console.info(`\n[Step 2] Authenticating via NextAuth credentials flow...`);
   const csrfRes = await fetch(`${BASE_URL}/api/auth/csrf`);
-  const rawCsrfCookies = csrfRes.headers.getSetCookie ? csrfRes.headers.getSetCookie() : [csrfRes.headers.get('set-cookie') ?? ''];
-  const csrfCookieHeader = rawCsrfCookies.map((c) => c.split(';')[0]).filter(Boolean).join('; ');
+  const rawCsrfCookies = csrfRes.headers.getSetCookie
+    ? csrfRes.headers.getSetCookie()
+    : [csrfRes.headers.get('set-cookie') ?? ''];
+  const csrfCookieHeader = rawCsrfCookies
+    .map((c) => c.split(';')[0])
+    .filter(Boolean)
+    .join('; ');
   const { csrfToken } = (await csrfRes.json()) as { csrfToken: string };
 
   const params = new URLSearchParams();
@@ -73,10 +78,17 @@ async function runE2E() {
     redirect: 'manual',
   });
 
-  const rawLoginCookies = loginRes.headers.getSetCookie ? loginRes.headers.getSetCookie() : [loginRes.headers.get('set-cookie') ?? ''];
-  const sessionCookieHeader = rawLoginCookies.map((c) => c.split(';')[0]).filter(Boolean).join('; ');
+  const rawLoginCookies = loginRes.headers.getSetCookie
+    ? loginRes.headers.getSetCookie()
+    : [loginRes.headers.get('set-cookie') ?? ''];
+  const sessionCookieHeader = rawLoginCookies
+    .map((c) => c.split(';')[0])
+    .filter(Boolean)
+    .join('; ');
   if (!sessionCookieHeader.includes('next-auth.session-token')) {
-    throw new Error(`Failed to obtain next-auth.session-token cookie on login: ${JSON.stringify(rawLoginCookies)}`);
+    throw new Error(
+      `Failed to obtain next-auth.session-token cookie on login: ${JSON.stringify(rawLoginCookies)}`,
+    );
   }
   console.info(`✓ NextAuth JWT session cookie obtained successfully`);
 
@@ -91,7 +103,9 @@ async function runE2E() {
   if (!tasksRes.ok) {
     throw new Error(`Failed to fetch tasks with HTTP ${tasksRes.status}`);
   }
-  const tasksData = (await tasksRes.json()) as { tasks: Array<{ id: string; title: string; status: string; priority: string }> };
+  const tasksData = (await tasksRes.json()) as {
+    tasks: Array<{ id: string; title: string; status: string; priority: string }>;
+  };
   const initialTasks = tasksData.tasks ?? [];
 
   const eventsRes = await fetch(`${BASE_URL}/api/events`, { headers: authHeaders });
@@ -99,10 +113,14 @@ async function runE2E() {
   const initialEvents = eventsData.events ?? [];
 
   const projectsRes = await fetch(`${BASE_URL}/api/projects`, { headers: authHeaders });
-  const projectsData = (await projectsRes.json()) as { projects: Array<{ id: string; name: string }> };
+  const projectsData = (await projectsRes.json()) as {
+    projects: Array<{ id: string; name: string }>;
+  };
   const initialProjects = projectsData.projects ?? [];
 
-  console.info(`✓ Onboarding created: ${initialProjects.length} projects, ${initialTasks.length} tasks, ${initialEvents.length} calendar events`);
+  console.info(
+    `✓ Onboarding created: ${initialProjects.length} projects, ${initialTasks.length} tasks, ${initialEvents.length} calendar events`,
+  );
   if (initialTasks.length === 0 || initialEvents.length === 0 || initialProjects.length === 0) {
     throw new Error('Starter workspace was not created properly by onboarding!');
   }
@@ -147,16 +165,24 @@ async function runE2E() {
   const postSessions1 = await prisma.agentSession.findMany({ where: { userId: signupData.id } });
 
   console.info(`✓ PostgreSQL Agent Sessions: ${postSessions1.length}`);
-  console.info(`✓ PostgreSQL Calendar Events: ${postEvents1.length} (Initial was ${initialEvents.length})`);
+  console.info(
+    `✓ PostgreSQL Calendar Events: ${postEvents1.length} (Initial was ${initialEvents.length})`,
+  );
 
-  const demoPracticeEvent = postEvents1.find((e) => e.title.toLowerCase().includes('demo practice'));
+  const demoPracticeEvent = postEvents1.find((e) =>
+    e.title.toLowerCase().includes('demo practice'),
+  );
   if (!demoPracticeEvent) {
-    throw new Error('Expected "Demo Practice" calendar event was not created in PostgreSQL by execute_plan!');
+    throw new Error(
+      'Expected "Demo Practice" calendar event was not created in PostgreSQL by execute_plan!',
+    );
   }
-  console.info(`✓ Verified "Demo Practice" event created in DB: ${demoPracticeEvent.id} (${demoPracticeEvent.start.toISOString()} to ${demoPracticeEvent.end.toISOString()})`);
+  console.info(
+    `✓ Verified "Demo Practice" event created in DB: ${demoPracticeEvent.id} (${demoPracticeEvent.start.toISOString()} to ${demoPracticeEvent.end.toISOString()})`,
+  );
 
   // ── Step 7: Replanning Command with 90-minute constraint ──
-  const goal2 = "I only have 90 minutes tonight. Replan it.";
+  const goal2 = 'I only have 90 minutes tonight. Replan it.';
   console.info(`\n[Step 7] Submitting replanning request: "${goal2}"...`);
 
   const chatRes2 = await fetch(`${BASE_URL}/api/agent/chat`, {
@@ -166,7 +192,9 @@ async function runE2E() {
   });
 
   if (!chatRes2.ok) {
-    throw new Error(`Replanning Chat API failed with HTTP ${chatRes2.status}: ${await chatRes2.text()}`);
+    throw new Error(
+      `Replanning Chat API failed with HTTP ${chatRes2.status}: ${await chatRes2.text()}`,
+    );
   }
   const { sessionId: session2Id } = (await chatRes2.json()) as { sessionId: string };
   console.info(`✓ Replanning session started: Session ID=${session2Id}`);
@@ -190,25 +218,37 @@ async function runE2E() {
   const totalTaskMinutes = taskItemsInPlan.reduce((acc, i) => acc + (i.durationMinutes || 0), 0);
 
   console.info(`✓ Total task minutes scheduled in new plan: ${totalTaskMinutes} minutes`);
-  console.info(`  Scheduled tasks: ${taskItemsInPlan.map((t) => `"${t.title}" (${t.durationMinutes}m)`).join(', ')}`);
+  console.info(
+    `  Scheduled tasks: ${taskItemsInPlan.map((t) => `"${t.title}" (${t.durationMinutes}m)`).join(', ')}`,
+  );
 
   if (totalTaskMinutes > 90) {
-    throw new Error(`Plan violated constraint: ${totalTaskMinutes} minutes scheduled, expected <= 90 minutes!`);
+    throw new Error(
+      `Plan violated constraint: ${totalTaskMinutes} minutes scheduled, expected <= 90 minutes!`,
+    );
   }
   console.info(`✓ Constraint strictly satisfied: ${totalTaskMinutes}m <= 90m`);
 
   // ── Step 10: Persistence Test after refresh / re-query ──
   console.info(`\n[Step 10] Testing state persistence across simulated reload...`);
   const finalTasksRes = await fetch(`${BASE_URL}/api/tasks`, { headers: authHeaders });
-  const finalTasksData = (await finalTasksRes.json()) as { tasks: Array<{ id: string; title: string; status: string }> };
+  const finalTasksData = (await finalTasksRes.json()) as {
+    tasks: Array<{ id: string; title: string; status: string }>;
+  };
   const finalTasks = finalTasksData.tasks ?? [];
   const finalEventsRes = await fetch(`${BASE_URL}/api/events`, { headers: authHeaders });
-  const finalEventsData = (await finalEventsRes.json()) as { events: Array<{ id: string; title: string }> };
+  const finalEventsData = (await finalEventsRes.json()) as {
+    events: Array<{ id: string; title: string }>;
+  };
   const finalEvents = finalEventsData.events ?? [];
 
-  console.info(`✓ Data re-queried via API: ${finalTasks.length} tasks, ${finalEvents.length} events`);
+  console.info(
+    `✓ Data re-queried via API: ${finalTasks.length} tasks, ${finalEvents.length} events`,
+  );
   const dbSessions = await prisma.agentSession.findMany({ where: { userId: signupData.id } });
-  console.info(`✓ Agent sessions persisted in PostgreSQL: ${dbSessions.length} sessions (both completed)`);
+  console.info(
+    `✓ Agent sessions persisted in PostgreSQL: ${dbSessions.length} sessions (both completed)`,
+  );
   for (const s of dbSessions) {
     console.info(`   - Session ${s.id}: goal="${s.goal}", status="${s.status}"`);
   }

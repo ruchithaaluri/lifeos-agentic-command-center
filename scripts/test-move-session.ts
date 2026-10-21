@@ -2,7 +2,7 @@ import { prisma } from '@lifeos/database';
 
 async function testMove() {
   console.log('Testing: Move my practice session to 8 PM...');
-  
+
   // 1. Get initial event state for Alex Chen
   const demoUserId = '00000000-0000-0000-0000-000000000001';
   const initialEvent = await prisma.calendarEvent.findFirst({
@@ -19,11 +19,11 @@ async function testMove() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ goal: 'Move my practice session to 8 PM.' }),
   });
-  
+
   if (!res.ok) {
     throw new Error(`Chat failed: ${res.status} ${await res.text()}`);
   }
-  const { sessionId } = await res.json() as { sessionId: string };
+  const { sessionId } = (await res.json()) as { sessionId: string };
   console.log('Agent session started:', sessionId);
 
   // 3. Listen to SSE stream
@@ -46,7 +46,9 @@ async function testMove() {
         const text = line.slice(5).trim();
         if (!text) continue;
         const ev = JSON.parse(text);
-        console.log(`SSE: [${ev.type}] tool=${ev.tool ?? ''} msg=${ev.message ?? ev.summary ?? ''}`);
+        console.log(
+          `SSE: [${ev.type}] tool=${ev.tool ?? ''} msg=${ev.message ?? ev.summary ?? ''}`,
+        );
         if (ev.type === 'session_complete' || ev.type === 'session_error') {
           done = true;
           break;
@@ -63,11 +65,15 @@ async function testMove() {
     },
   });
   console.log('Updated event:', updatedEvent?.title, 'start:', updatedEvent?.start.toISOString());
-  
+
   // Format in user's timezone (America/Los_Angeles)
   const user = await prisma.user.findUnique({ where: { id: demoUserId } });
   const tz = user?.timezone ?? 'America/Los_Angeles';
-  const localTime = updatedEvent?.start.toLocaleTimeString('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit' });
+  const localTime = updatedEvent?.start.toLocaleTimeString('en-US', {
+    timeZone: tz,
+    hour: 'numeric',
+    minute: '2-digit',
+  });
   console.log(`Local start time in ${tz}: ${localTime}`);
 }
 

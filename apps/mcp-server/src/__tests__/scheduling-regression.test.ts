@@ -100,7 +100,10 @@ describe('Scheduling Regression Tests', () => {
       TEST_USER_ID,
     );
     const planOutput = JSON.parse(planRaw) as {
-      plan: { id: string; items: Array<{ durationMinutes: number; reason?: string; title: string }> };
+      plan: {
+        id: string;
+        items: Array<{ durationMinutes: number; reason?: string; title: string }>;
+      };
       changesRequired: Array<{ type: string; payload: Record<string, unknown> }>;
     };
 
@@ -130,12 +133,22 @@ describe('Scheduling Regression Tests', () => {
     expect(demoEvent).toBeDefined();
     if (!demoEvent) throw new Error('demoEvent not found');
 
-    const demoStartStr = demoEvent.start.toLocaleTimeString('en-US', { timeZone: TIMEZONE, hour12: false });
-    const demoEndStr = demoEvent.end.toLocaleTimeString('en-US', { timeZone: TIMEZONE, hour12: false });
+    const demoStartStr = demoEvent.start.toLocaleTimeString('en-US', {
+      timeZone: TIMEZONE,
+      hour12: false,
+    });
+    const demoEndStr = demoEvent.end.toLocaleTimeString('en-US', {
+      timeZone: TIMEZONE,
+      hour12: false,
+    });
 
     // Ensure it falls within evening window (18:00 - 22:30) and NOT 00:00 (12:00 AM)
-    expect(demoEvent.start.getTime()).toBeLessThan(getLocalDate(TARGET_DATE, '23:59:59', TIMEZONE).getTime());
-    expect(demoEvent.start.getTime()).toBeGreaterThanOrEqual(getLocalDate(TARGET_DATE, '18:00:00', TIMEZONE).getTime());
+    expect(demoEvent.start.getTime()).toBeLessThan(
+      getLocalDate(TARGET_DATE, '23:59:59', TIMEZONE).getTime(),
+    );
+    expect(demoEvent.start.getTime()).toBeGreaterThanOrEqual(
+      getLocalDate(TARGET_DATE, '18:00:00', TIMEZONE).getTime(),
+    );
     expect(demoStartStr).not.toBe('00:00:00');
     expect(demoEndStr).not.toBe('00:00:00');
 
@@ -160,7 +173,10 @@ describe('Scheduling Regression Tests', () => {
       plan: { id: string };
       changesRequired: Array<{ type: string; payload: Record<string, unknown> }>;
     };
-    await executePlanTool.execute({ planId: plan1.plan.id, actions: plan1.changesRequired }, TEST_USER_ID);
+    await executePlanTool.execute(
+      { planId: plan1.plan.id, actions: plan1.changesRequired },
+      TEST_USER_ID,
+    );
 
     // Verify 1 Demo Practice event exists
     const eventsBefore = await prisma.calendarEvent.findMany({ where: { userId: TEST_USER_ID } });
@@ -187,7 +203,10 @@ describe('Scheduling Regression Tests', () => {
     expect(newDemoEventActions.length).toBe(0);
 
     // Execute replan
-    await executePlanTool.execute({ planId: replan.plan.id, actions: replan.changesRequired }, TEST_USER_ID);
+    await executePlanTool.execute(
+      { planId: replan.plan.id, actions: replan.changesRequired },
+      TEST_USER_ID,
+    );
 
     // Verify database state: exactly 1 Demo Practice event, no duplicate
     const eventsAfter = await prisma.calendarEvent.findMany({ where: { userId: TEST_USER_ID } });
@@ -221,7 +240,10 @@ describe('Scheduling Regression Tests', () => {
     };
 
     // First execution
-    await executePlanTool.execute({ planId: plan.plan.id, actions: plan.changesRequired }, TEST_USER_ID);
+    await executePlanTool.execute(
+      { planId: plan.plan.id, actions: plan.changesRequired },
+      TEST_USER_ID,
+    );
     const countAfterFirst = await prisma.calendarEvent.count({ where: { userId: TEST_USER_ID } });
 
     // Second execution with identical payload
@@ -457,7 +479,12 @@ describe('Scheduling Regression Tests', () => {
     await prisma.task.createMany({
       data: [
         { userId: TEST_USER_ID, title: 'Practice product demo', priority: 'high', status: 'todo' },
-        { userId: TEST_USER_ID, title: 'Finish presentation slides', priority: 'medium', status: 'todo' },
+        {
+          userId: TEST_USER_ID,
+          title: 'Finish presentation slides',
+          priority: 'medium',
+          status: 'todo',
+        },
         { userId: TEST_USER_ID, title: 'Draft talking points', priority: 'low', status: 'todo' },
       ],
     });
@@ -496,7 +523,9 @@ describe('Scheduling Regression Tests', () => {
     expect(timeFormatted).toBe('20:00');
 
     // 3. ZERO tasks in changesRequired (no update_task or create_task)
-    const taskChanges = planOutput.changesRequired.filter((c) => c.type === 'update_task' || c.type === 'create_task');
+    const taskChanges = planOutput.changesRequired.filter(
+      (c) => c.type === 'update_task' || c.type === 'create_task',
+    );
     expect(taskChanges.length).toBe(0);
 
     // 4. Execute the targeted move
@@ -513,7 +542,12 @@ describe('Scheduling Regression Tests', () => {
     expect(updatedEvent).toBeDefined();
     if (!updatedEvent) throw new Error('updatedEvent is required');
     expect(
-      updatedEvent.start.toLocaleTimeString('en-US', { timeZone: TIMEZONE, hour: '2-digit', minute: '2-digit', hour12: false }),
+      updatedEvent.start.toLocaleTimeString('en-US', {
+        timeZone: TIMEZONE,
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }),
     ).toBe('20:00');
 
     const tasksAfter = await prisma.task.findMany({ where: { userId: TEST_USER_ID } });

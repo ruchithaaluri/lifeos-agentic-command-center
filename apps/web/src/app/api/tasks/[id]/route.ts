@@ -5,10 +5,7 @@ import { requireUserId, serverError } from '@/lib/api-guard';
 
 export const dynamic = 'force-dynamic';
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const guard = await requireUserId();
   if ('response' in guard) return guard.response;
 
@@ -37,10 +34,13 @@ export async function PATCH(
 
     const updateData: Record<string, unknown> = {};
     if (typeof body['title'] === 'string') updateData['title'] = body['title'].trim();
-    if (typeof body['description'] === 'string') updateData['description'] = body['description'].trim();
+    if (typeof body['description'] === 'string')
+      updateData['description'] = body['description'].trim();
     if (typeof body['priority'] === 'string') updateData['priority'] = body['priority'];
-    if (typeof body['estimatedMinutes'] === 'number') updateData['estimatedMinutes'] = body['estimatedMinutes'];
-    if (typeof body['projectId'] === 'string' || body['projectId'] === null) updateData['projectId'] = body['projectId'];
+    if (typeof body['estimatedMinutes'] === 'number')
+      updateData['estimatedMinutes'] = body['estimatedMinutes'];
+    if (typeof body['projectId'] === 'string' || body['projectId'] === null)
+      updateData['projectId'] = body['projectId'];
 
     if (body['dueDate'] !== undefined) {
       if (body['dueDate'] === null || body['dueDate'] === '') {
@@ -78,15 +78,14 @@ export async function PATCH(
       },
     });
   } catch (err) {
-    console.error('api/tasks/[id] PATCH failed', { message: err instanceof Error ? err.message : 'unknown' });
+    console.error('api/tasks/[id] PATCH failed', {
+      message: err instanceof Error ? err.message : 'unknown',
+    });
     return serverError('Updating task');
   }
 }
 
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
   const guard = await requireUserId();
   if ('response' in guard) return guard.response;
 
@@ -110,7 +109,9 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, message: 'Task deleted successfully.' });
   } catch (err) {
-    console.error('api/tasks/[id] DELETE failed', { message: err instanceof Error ? err.message : 'unknown' });
+    console.error('api/tasks/[id] DELETE failed', {
+      message: err instanceof Error ? err.message : 'unknown',
+    });
     return serverError('Deleting task');
   }
 }

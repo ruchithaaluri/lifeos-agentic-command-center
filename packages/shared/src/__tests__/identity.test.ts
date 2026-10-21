@@ -96,9 +96,9 @@ describe('signIdentityToken / verifyIdentityToken', () => {
 
   it('rejects a well-signed token whose subject is not a uuid', () => {
     // Simulates a payload signed with the right key but an invalid subject.
-    const payload = Buffer.from(
-      JSON.stringify({ sub: 'demo-user', exp: T0 + 100 }),
-    ).toString('base64url');
+    const payload = Buffer.from(JSON.stringify({ sub: 'demo-user', exp: T0 + 100 })).toString(
+      'base64url',
+    );
     // Signature computed over the same domain separator the codec uses.
     const signature = createHmac('sha256', SECRET)
       .update(`lifeos:mcp-identity:v1.${payload}`)

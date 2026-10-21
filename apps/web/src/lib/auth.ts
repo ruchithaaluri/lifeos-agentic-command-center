@@ -30,10 +30,7 @@ export const authOptions: NextAuthOptions = {
         const user = await prisma.user.findUnique({ where: { email } });
         // Always run a hash comparison so a missing user and a wrong password
         // take a similar amount of time.
-        const ok = await verifyPassword(
-          password,
-          user?.passwordHash ?? 'scrypt$00$00',
-        );
+        const ok = await verifyPassword(password, user?.passwordHash ?? 'scrypt$00$00');
         if (!user || !user.passwordHash || !ok) return null;
 
         return { id: user.id, email: user.email, name: user.name };

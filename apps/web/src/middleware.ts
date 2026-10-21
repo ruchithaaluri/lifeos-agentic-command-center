@@ -27,9 +27,7 @@ export async function middleware(req: NextRequest) {
 
   if (process.env['DEMO_MODE'] === 'true') return NextResponse.next();
 
-  const isProtected = PROTECTED.some(
-    (p) => pathname === p || pathname.startsWith(`${p}/`),
-  );
+  const isProtected = PROTECTED.some((p) => pathname === p || pathname.startsWith(`${p}/`));
   if (!isProtected) return NextResponse.next();
 
   let token: { userId?: string } | null = null;
@@ -47,5 +45,13 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/today/:path*', '/tasks/:path*', '/projects/:path*', '/activity/:path*', '/settings/:path*', '/alexa/:path*'],
+  matcher: [
+    '/dashboard/:path*',
+    '/today/:path*',
+    '/tasks/:path*',
+    '/projects/:path*',
+    '/activity/:path*',
+    '/settings/:path*',
+    '/alexa/:path*',
+  ],
 };

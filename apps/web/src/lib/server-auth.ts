@@ -34,4 +34,3 @@ export async function resolveUserId(): Promise<string | null> {
   if (isDemoMode()) return getDemoUserId();
   return null;
 }
-

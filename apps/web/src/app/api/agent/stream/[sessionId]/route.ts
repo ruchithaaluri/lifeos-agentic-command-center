@@ -10,10 +10,7 @@ export const dynamic = 'force-dynamic';
 // guessed or observed one could read another user's agent transcript.
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { sessionId: string } },
-) {
+export async function GET(_req: NextRequest, { params }: { params: { sessionId: string } }) {
   const userId = await resolveUserId();
   if (!userId) {
     return new Response('Unauthorized', {

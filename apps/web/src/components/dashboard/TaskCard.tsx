@@ -22,8 +22,7 @@ export function TaskCard({ task, className, onRefresh }: TaskCardProps) {
   const removeTask = useDashboardStore((s) => s.removeTask);
 
   const isCompleted = task.status === 'completed';
-  const isOverdue =
-    task.dueDate && new Date(task.dueDate) < new Date() && !isCompleted;
+  const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && !isCompleted;
 
   async function handleToggle(e: React.MouseEvent) {
     e.stopPropagation();
@@ -96,7 +95,7 @@ export function TaskCard({ task, className, onRefresh }: TaskCardProps) {
         }}
         disabled={isUpdating}
         className={cn(
-          'mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded border transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
+          'h-4.5 w-4.5 mt-0.5 flex shrink-0 items-center justify-center rounded border transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
           isCompleted
             ? 'border-emerald-500/80 bg-emerald-500/20 text-emerald-400'
             : 'border-white/20 bg-white/5 hover:border-blue-400/60 hover:bg-white/10',
@@ -173,7 +172,7 @@ export function TaskCard({ task, className, onRefresh }: TaskCardProps) {
             setShowEdit(true);
           }}
           disabled={isUpdating}
-          className="rounded p-1 text-slate-500 opacity-0 transition-opacity hover:bg-white/10 hover:text-blue-300 group-hover:opacity-100 focus:opacity-100"
+          className="rounded p-1 text-slate-500 opacity-0 transition-opacity hover:bg-white/10 hover:text-blue-300 focus:opacity-100 group-hover:opacity-100"
           aria-label="Edit task"
           title="Edit task"
         >
@@ -186,7 +185,7 @@ export function TaskCard({ task, className, onRefresh }: TaskCardProps) {
             void handleDelete(e);
           }}
           disabled={isUpdating}
-          className="rounded p-1 text-slate-500 opacity-0 transition-opacity hover:bg-white/10 hover:text-red-400 group-hover:opacity-100 focus:opacity-100"
+          className="rounded p-1 text-slate-500 opacity-0 transition-opacity hover:bg-white/10 hover:text-red-400 focus:opacity-100 group-hover:opacity-100"
           aria-label="Delete task"
           title="Delete task"
         >

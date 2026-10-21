@@ -25,7 +25,7 @@ async function runIsolationTest() {
   if (!aliceSignupRes.ok) {
     throw new Error(`Alice signup failed: ${aliceSignupRes.status} ${await aliceSignupRes.text()}`);
   }
-  const alice = await aliceSignupRes.json() as { id: string; email: string };
+  const alice = (await aliceSignupRes.json()) as { id: string; email: string };
 
   // Alice creates a private task and event
   const aliceTask = await prisma.task.create({
@@ -61,14 +61,17 @@ async function runIsolationTest() {
   if (!bobSignupRes.ok) {
     throw new Error(`Bob signup failed: ${bobSignupRes.status} ${await bobSignupRes.text()}`);
   }
-  const bob = await bobSignupRes.json() as { id: string; email: string };
+  const bob = (await bobSignupRes.json()) as { id: string; email: string };
 
   // Bob logs in via NextAuth credentials endpoint
   console.log('\n[3] Authenticating as Bob...');
   const csrfRes = await fetch('http://localhost:3000/api/auth/csrf');
   const { csrfToken } = (await csrfRes.json()) as { csrfToken: string };
   const rawCookieHeader = csrfRes.headers.get('set-cookie') || '';
-  const initialCookies = rawCookieHeader.split(',').map((c) => c.split(';')[0].trim()).join('; ');
+  const initialCookies = rawCookieHeader
+    .split(',')
+    .map((c) => c.split(';')[0].trim())
+    .join('; ');
 
   const signInRes = await fetch('http://localhost:3000/api/auth/callback/credentials', {
     method: 'POST',
@@ -99,19 +102,29 @@ async function runIsolationTest() {
   const bobTasksRes = await fetch('http://localhost:3000/api/tasks', {
     headers: { Cookie: bobCookies },
   });
-  const bobTasksData = await bobTasksRes.json() as { tasks: Array<{ id: string; title: string }> };
+  const bobTasksData = (await bobTasksRes.json()) as {
+    tasks: Array<{ id: string; title: string }>;
+  };
 
   const bobEventsRes = await fetch('http://localhost:3000/api/events', {
     headers: { Cookie: bobCookies },
   });
-  const bobEventsData = await bobEventsRes.json() as { events: Array<{ id: string; title: string }> };
+  const bobEventsData = (await bobEventsRes.json()) as {
+    events: Array<{ id: string; title: string }>;
+  };
 
   // Check that Bob CANNOT see Alice's data
-  const canSeeAliceTask = bobTasksData.tasks.some((t) => t.id === aliceTask.id || t.title.includes('Alice'));
-  const canSeeAliceEvent = bobEventsData.events.some((e) => e.id === aliceEvent.id || e.title.includes('Alice'));
+  const canSeeAliceTask = bobTasksData.tasks.some(
+    (t) => t.id === aliceTask.id || t.title.includes('Alice'),
+  );
+  const canSeeAliceEvent = bobEventsData.events.some(
+    (e) => e.id === aliceEvent.id || e.title.includes('Alice'),
+  );
 
   if (canSeeAliceTask || canSeeAliceEvent) {
-    throw new Error(`SECURITY BREACH: Bob can see Alice's data! task=${canSeeAliceTask}, event=${canSeeAliceEvent}`);
+    throw new Error(
+      `SECURITY BREACH: Bob can see Alice's data! task=${canSeeAliceTask}, event=${canSeeAliceEvent}`,
+    );
   }
   console.log("✓ Bob cannot see Alice's tasks or events in API responses");
 
@@ -134,7 +147,9 @@ async function runIsolationTest() {
   if (verifiedAliceTask?.title !== 'Alice Top Secret Plan') {
     throw new Error("SECURITY BREACH: Bob mutated Alice's task!");
   }
-  console.log("✓ Alice's task remained completely untouched in database (cross-user mutation prevented)");
+  console.log(
+    "✓ Alice's task remained completely untouched in database (cross-user mutation prevented)",
+  );
 
   // 6. Test MCP tool scoping for Bob
   console.log('\n[6] Bob calls agent chat (which invokes MCP tools with signed identity)...');
@@ -150,7 +165,7 @@ async function runIsolationTest() {
   if (!agentRes.ok) {
     throw new Error(`Bob agent call failed: ${agentRes.status} ${await agentRes.text()}`);
   }
-  const { sessionId: bobSessionId } = await agentRes.json() as { sessionId: string };
+  const { sessionId: bobSessionId } = (await agentRes.json()) as { sessionId: string };
 
   // Listen to SSE to let it complete
   const sseRes = await fetch(`http://localhost:3000/api/agent/stream/${bobSessionId}`, {
@@ -185,7 +200,9 @@ async function runIsolationTest() {
     where: { id: bobSessionId },
   });
   if (bobSession?.userId !== bob.id) {
-    throw new Error(`SECURITY BREACH: Agent session userId is ${bobSession?.userId}, expected Bob's id ${bob.id}`);
+    throw new Error(
+      `SECURITY BREACH: Agent session userId is ${bobSession?.userId}, expected Bob's id ${bob.id}`,
+    );
   }
   console.log(`✓ Agent session correctly scoped to Bob's userId: ${bobSession.userId}`);
 
@@ -194,7 +211,7 @@ async function runIsolationTest() {
   if (aliceSessions.some((s) => s.id === bobSessionId)) {
     throw new Error("SECURITY BREACH: Bob's session leaked into Alice's account!");
   }
-  console.log("✓ Zero session leakage between Alice and Bob");
+  console.log('✓ Zero session leakage between Alice and Bob');
 
   console.log('\n====================================================');
   console.log('CROSS-USER ISOLATION TEST PASSED FULLY!');

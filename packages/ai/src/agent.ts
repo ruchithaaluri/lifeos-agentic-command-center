@@ -62,9 +62,7 @@ export function extractGoalConstraints(goal: string): string[] {
   const constraints: string[] = [];
 
   // "90 minutes", "1.5 hours", "2 hrs", "45 min"
-  const duration = goal.match(
-    /\b(\d+(?:\.\d+)?)\s*(hours?|hrs?|minutes?|mins?)\b/i,
-  );
+  const duration = goal.match(/\b(\d+(?:\.\d+)?)\s*(hours?|hrs?|minutes?|mins?)\b/i);
   if (duration?.[1] && duration[2]) {
     const amount = Number(duration[1]);
     const isHours = /^h/i.test(duration[2]);
@@ -76,18 +74,13 @@ export function extractGoalConstraints(goal: string): string[] {
   }
 
   // Explicit time constraint: e.g. "to 8 PM", "at 8:00 PM", "to 8pm", "for 3 PM"
-  const timeMatch = goal.match(
-    /\b(?:to|at|for)\s+(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)\b/i,
-  );
+  const timeMatch = goal.match(/\b(?:to|at|for)\s+(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)\b/i);
   if (timeMatch?.[1]) {
     constraints.push(`explicit time: ${timeMatch[1].trim()}`);
   }
 
   // Targeted move / reschedule intent
-  if (
-    /\b(?:move|reschedule|shift|push)\b/i.test(goal) &&
-    !/\b(?:replan|rebuild)\b/i.test(goal)
-  ) {
+  if (/\b(?:move|reschedule|shift|push)\b/i.test(goal) && !/\b(?:replan|rebuild)\b/i.test(goal)) {
     constraints.push('targeted_reschedule: true');
   }
 
@@ -170,8 +163,7 @@ export class AgentOrchestrator {
       );
       const parsed = JSON.parse(result.content) as Partial<ParsedIntent>;
       const isMove =
-        /\b(?:move|reschedule|shift|push)\b/i.test(goal) &&
-        !/\b(?:replan|rebuild)\b/i.test(goal);
+        /\b(?:move|reschedule|shift|push)\b/i.test(goal) && !/\b(?:replan|rebuild)\b/i.test(goal);
 
       return {
         primary_intent: isMove ? 'reschedule' : (parsed.primary_intent ?? 'plan'),
@@ -179,9 +171,15 @@ export class AgentOrchestrator {
         key_entities: parsed.key_entities ?? [],
         // A model can return a malformed value here; generate_plan validates
         // `constraints` as string[] and would reject the whole call.
-        constraints: Array.isArray(parsed.constraints) && parsed.constraints.length > 0
-          ? Array.from(new Set([...parsed.constraints.filter((c: unknown): c is string => typeof c === 'string'), ...extractGoalConstraints(goal)]))
-          : extractGoalConstraints(goal),
+        constraints:
+          Array.isArray(parsed.constraints) && parsed.constraints.length > 0
+            ? Array.from(
+                new Set([
+                  ...parsed.constraints.filter((c: unknown): c is string => typeof c === 'string'),
+                  ...extractGoalConstraints(goal),
+                ]),
+              )
+            : extractGoalConstraints(goal),
         urgency: parsed.urgency ?? 'normal',
       };
     } catch {
@@ -189,8 +187,7 @@ export class AgentOrchestrator {
       // JSON). Explicit time budgets and move intents stated by the user are still honoured —
       // see extractGoalConstraints for why this matters.
       const isMove =
-        /\b(?:move|reschedule|shift|push)\b/i.test(goal) &&
-        !/\b(?:replan|rebuild)\b/i.test(goal);
+        /\b(?:move|reschedule|shift|push)\b/i.test(goal) && !/\b(?:replan|rebuild)\b/i.test(goal);
 
       return {
         primary_intent: isMove ? 'reschedule' : 'plan',

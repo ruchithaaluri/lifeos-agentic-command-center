@@ -272,11 +272,7 @@ export const executePlanTool = {
             input: {},
             output: { id: r.id, status: r.status },
             status:
-              r.status === 'success'
-                ? 'success'
-                : r.status === 'failed'
-                  ? 'failed'
-                  : 'pending',
+              r.status === 'success' ? 'success' : r.status === 'failed' ? 'failed' : 'pending',
             message: r.message,
           })),
         })
@@ -303,9 +299,7 @@ export const executePlanTool = {
       const successfulMessages = results
         .filter((r) => r.status === 'success')
         .map((r) => r.message);
-      const failedMessages = results
-        .filter((r) => r.status === 'failed')
-        .map((r) => r.message);
+      const failedMessages = results.filter((r) => r.status === 'failed').map((r) => r.message);
 
       if (actionsFailed === 0) {
         summary = `Executed ${actionsExecuted} actions: ${successfulMessages.join('; ')}.`;

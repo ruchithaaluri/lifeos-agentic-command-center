@@ -154,9 +154,7 @@ function buildRuleBasedPlan(
 
   // 1. Determine time budget (maxMinutes)
   let maxMinutes = 8 * 60; // default full workday
-  const durationMatch = allConstraintsText.match(
-    /(\d+(?:\.\d+)?)\s*(hours?|hrs?|minutes?|mins?)/i,
-  );
+  const durationMatch = allConstraintsText.match(/(\d+(?:\.\d+)?)\s*(hours?|hrs?|minutes?|mins?)/i);
   if (durationMatch?.[1] && durationMatch[2]) {
     const num = parseFloat(durationMatch[1]);
     const isHours = /^h/i.test(durationMatch[2]);
@@ -167,9 +165,7 @@ function buildRuleBasedPlan(
   let windowStart: Date;
   let windowEnd: Date;
 
-  const explicitTimeMatch = allConstraintsText.match(
-    /\bat\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/i,
-  );
+  const explicitTimeMatch = allConstraintsText.match(/\bat\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/i);
   if (explicitTimeMatch?.[1]) {
     let hour = parseInt(explicitTimeMatch[1], 10);
     const min = explicitTimeMatch[2] ? parseInt(explicitTimeMatch[2], 10) : 0;
@@ -197,9 +193,7 @@ function buildRuleBasedPlan(
   }
 
   // 3. Add all existing calendar events to plan items
-  const existingDemoEvent = events.find((e) =>
-    e.title.toLowerCase().includes('demo practice'),
-  );
+  const existingDemoEvent = events.find((e) => e.title.toLowerCase().includes('demo practice'));
 
   for (const e of events) {
     items.push({
@@ -212,9 +206,7 @@ function buildRuleBasedPlan(
       eventId: e.id,
       status: 'planned',
       reason:
-        e.id === existingDemoEvent?.id
-          ? 'Scheduled demo practice'
-          : 'Existing calendar event',
+        e.id === existingDemoEvent?.id ? 'Scheduled demo practice' : 'Existing calendar event',
     });
   }
 
@@ -237,14 +229,10 @@ function buildRuleBasedPlan(
     if (existingMatchingEvent) {
       // Replan case: event already exists in DB, reuse it!
       const existingDuration = Math.round(
-        (existingMatchingEvent.end.getTime() - existingMatchingEvent.start.getTime()) /
-          60_000,
+        (existingMatchingEvent.end.getTime() - existingMatchingEvent.start.getTime()) / 60_000,
       );
       // Count existing event towards the session budget if it falls in the window
-      if (
-        existingMatchingEvent.start >= windowStart &&
-        existingMatchingEvent.end <= windowEnd
-      ) {
+      if (existingMatchingEvent.start >= windowStart && existingMatchingEvent.end <= windowEnd) {
         remainingBudget = Math.max(0, remainingBudget - existingDuration);
         scheduledNewMinutes += existingDuration;
       }
@@ -256,9 +244,7 @@ function buildRuleBasedPlan(
       if (prepDuration >= 15 && availableSlots.length > 0) {
         const slot = availableSlots[0];
         if (slot) {
-          const slotDuration = Math.round(
-            (slot.end.getTime() - slot.start.getTime()) / 60_000,
-          );
+          const slotDuration = Math.round((slot.end.getTime() - slot.start.getTime()) / 60_000);
           if (slotDuration >= prepDuration) {
             const prepStart = slot.start;
             const prepEnd = new Date(prepStart.getTime() + prepDuration * 60_000);
@@ -378,21 +364,18 @@ function buildRuleBasedPlan(
   }
 
   // 7. Sort all items chronologically
-  items.sort(
-    (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
-  );
+  items.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 
   const scheduledTasksCount = changesRequired.filter(
     (c) => c.type === 'update_task' || c.type === 'create_task',
   ).length;
-  const createdEventsCount = changesRequired.filter(
-    (c) => c.type === 'create_event',
-  ).length;
+  const createdEventsCount = changesRequired.filter((c) => c.type === 'create_event').length;
   const existingEventsCount = items.filter(
     (i) => i.type === 'event' && i.reason?.includes('Existing'),
   ).length;
 
-  const budgetNotice = maxMinutes < 480 ? `${maxMinutes}-minute budget evaluated` : 'workday schedule evaluated';
+  const budgetNotice =
+    maxMinutes < 480 ? `${maxMinutes}-minute budget evaluated` : 'workday schedule evaluated';
 
   const plan: Plan = {
     id: planId,
@@ -415,7 +398,10 @@ function buildRuleBasedPlan(
 export function isTargetedMoveRequest(goal: string, constraints: string[] = []): boolean {
   const text = `${goal} ${constraints.join(' ')}`;
   const hasMoveVerb = /\b(?:move|reschedule|shift|push|change\s+the\s+time\s+of)\b/i.test(text);
-  const isFullReplan = /\b(?:rebuild\s+my\s+plan|replan\s+my\s+day|plan\s+my\s+day|replan\s+tomorrow|plan\s+tomorrow|full\s+day)\b/i.test(text);
+  const isFullReplan =
+    /\b(?:rebuild\s+my\s+plan|replan\s+my\s+day|plan\s+my\s+day|replan\s+tomorrow|plan\s+tomorrow|full\s+day)\b/i.test(
+      text,
+    );
   const hasTargetTime =
     /\b(?:to|at|for)\s+\d{1,2}(?::\d{2})?\s*(?:am|pm)?\b/i.test(text) ||
     constraints.some((c) => c.startsWith('explicit time:'));
@@ -430,7 +416,9 @@ interface ParsedTargetTime {
 
 function parseTargetTime(goal: string, constraints: string[] = []): ParsedTargetTime | null {
   const combined = `${goal} ${constraints.join(' ')}`;
-  const match = combined.match(/\b(?:to|at|for|explicit time:)\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/i);
+  const match = combined.match(
+    /\b(?:to|at|for|explicit time:)\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/i,
+  );
   if (!match || !match[1]) return null;
 
   let hour = parseInt(match[1], 10);
@@ -586,7 +574,10 @@ export async function buildTargetedReschedulePlan(opts: {
   // 2. Compute exact requested start and end times in user's timezone
   const timeStr = `${targetTime.hour.toString().padStart(2, '0')}:${targetTime.minute.toString().padStart(2, '0')}:00`;
   const targetStart = getLocalDate(date, timeStr, timezone);
-  const originalDurationMs = Math.max(15 * 60_000, targetEvent.end.getTime() - targetEvent.start.getTime());
+  const originalDurationMs = Math.max(
+    15 * 60_000,
+    targetEvent.end.getTime() - targetEvent.start.getTime(),
+  );
   const targetEnd = new Date(targetStart.getTime() + originalDurationMs);
   const durationMinutes = Math.round(originalDurationMs / 60_000);
 
@@ -757,7 +748,9 @@ export function buildTargetedReschedulePlanSync(
   }
 
   if (matchedEvents.length > 1) {
-    const exact = matchedEvents.find((e) => queryRaw && e.title.toLowerCase() === queryRaw.toLowerCase());
+    const exact = matchedEvents.find(
+      (e) => queryRaw && e.title.toLowerCase() === queryRaw.toLowerCase(),
+    );
     if (!exact) {
       return {
         plan: {
@@ -779,7 +772,10 @@ export function buildTargetedReschedulePlanSync(
 
   const timeStr = `${targetTime.hour.toString().padStart(2, '0')}:${targetTime.minute.toString().padStart(2, '0')}:00`;
   const targetStart = getLocalDate(date, timeStr, timezone);
-  const originalDurationMs = Math.max(15 * 60_000, targetEvent.end.getTime() - targetEvent.start.getTime());
+  const originalDurationMs = Math.max(
+    15 * 60_000,
+    targetEvent.end.getTime() - targetEvent.start.getTime(),
+  );
   const targetEnd = new Date(targetStart.getTime() + originalDurationMs);
   const durationMinutes = Math.round(originalDurationMs / 60_000);
 

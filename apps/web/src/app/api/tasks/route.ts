@@ -105,7 +105,9 @@ export async function GET(req: NextRequest) {
       tasks: tasks.map(serializeTask),
     });
   } catch (err) {
-    console.error('api/tasks GET failed', { message: err instanceof Error ? err.message : 'unknown' });
+    console.error('api/tasks GET failed', {
+      message: err instanceof Error ? err.message : 'unknown',
+    });
     return serverError('Loading tasks');
   }
 }
@@ -164,7 +166,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ task: serializeTask(task) }, { status: 201 });
   } catch (err) {
-    console.error('api/tasks POST failed', { message: err instanceof Error ? err.message : 'unknown' });
+    console.error('api/tasks POST failed', {
+      message: err instanceof Error ? err.message : 'unknown',
+    });
     return serverError('Creating task');
   }
 }
@@ -242,7 +246,9 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ task: serializeTask(updated) });
   } catch (err) {
-    console.error('api/tasks PATCH failed', { message: err instanceof Error ? err.message : 'unknown' });
+    console.error('api/tasks PATCH failed', {
+      message: err instanceof Error ? err.message : 'unknown',
+    });
     return serverError('Updating task');
   }
 }
@@ -289,7 +295,9 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Task deleted successfully.' });
   } catch (err) {
-    console.error('api/tasks DELETE failed', { message: err instanceof Error ? err.message : 'unknown' });
+    console.error('api/tasks DELETE failed', {
+      message: err instanceof Error ? err.message : 'unknown',
+    });
     return serverError('Deleting task');
   }
 }

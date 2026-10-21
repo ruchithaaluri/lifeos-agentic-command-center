@@ -157,7 +157,9 @@ export default function SettingsPage() {
               <div className="flex items-start gap-3">
                 <User className="mt-0.5 h-4 w-4 text-blue-400" />
                 <div className="flex-1">
-                  <label className="block text-xs font-medium text-slate-400">Authenticated Account</label>
+                  <label className="block text-xs font-medium text-slate-400">
+                    Authenticated Account
+                  </label>
                   <p className="text-sm font-medium text-slate-200">
                     {data?.user.name ?? 'Alex Chen'}
                     <span className="ml-2 font-normal text-slate-400">
@@ -191,17 +193,20 @@ export default function SettingsPage() {
               </div>
 
               {/* Timezone & Local Time Setting */}
-              <div className="flex items-start gap-3 rounded-xl border border-white/8 bg-white/[0.02] p-4">
+              <div className="border-white/8 flex items-start gap-3 rounded-xl border bg-white/[0.02] p-4">
                 <Globe className="mt-0.5 h-4 w-4 text-violet-400" />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <label htmlFor="tz-select" className="block text-xs font-semibold text-slate-300">
+                    <label
+                      htmlFor="tz-select"
+                      className="block text-xs font-semibold text-slate-300"
+                    >
                       Timezone & Local Time
                     </label>
                     <button
                       type="button"
                       onClick={handleAutoDetect}
-                      className="flex items-center gap-1 text-[11px] font-medium text-blue-400 hover:text-blue-300 transition-colors"
+                      className="flex items-center gap-1 text-[11px] font-medium text-blue-400 transition-colors hover:text-blue-300"
                     >
                       <Sparkles className="h-3 w-3" />
                       Auto-detect from device
@@ -216,7 +221,7 @@ export default function SettingsPage() {
                       id="tz-select"
                       value={selectedTz}
                       onChange={(e) => setSelectedTz(e.target.value)}
-                      className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white focus:border-violet-500 focus:outline-none [color-scheme:dark]"
+                      className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white [color-scheme:dark] focus:border-violet-500 focus:outline-none"
                     >
                       {!COMMON_TIMEZONES.some((tz) => tz.value === selectedTz) && (
                         <option value={selectedTz}>{selectedTz} (Custom)</option>
@@ -232,7 +237,9 @@ export default function SettingsPage() {
                   {currentTimePreview && (
                     <div className="mt-2.5 flex items-center gap-1.5 text-xs text-slate-400">
                       <Clock className="h-3.5 w-3.5 text-violet-400" />
-                      <span>Current time: <strong className="text-white">{currentTimePreview}</strong></span>
+                      <span>
+                        Current time: <strong className="text-white">{currentTimePreview}</strong>
+                      </span>
                     </div>
                   )}
 
@@ -243,7 +250,7 @@ export default function SettingsPage() {
                         void handleSaveTimezone();
                       }}
                       disabled={isSavingTz || selectedTz === data?.user.timezone}
-                      className="flex items-center gap-1.5 rounded-lg bg-violet-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-glow hover:bg-violet-500 disabled:opacity-50 transition-all"
+                      className="shadow-glow flex items-center gap-1.5 rounded-lg bg-violet-600 px-3.5 py-1.5 text-xs font-semibold text-white transition-all hover:bg-violet-500 disabled:opacity-50"
                     >
                       {isSavingTz ? (
                         <>
@@ -269,10 +276,14 @@ export default function SettingsPage() {
               <div className="flex items-start gap-3">
                 <Cpu className="mt-0.5 h-4 w-4 text-amber-400" />
                 <div className="flex-1">
-                  <label className="block text-xs font-medium text-slate-400">AI Provider & Model</label>
+                  <label className="block text-xs font-medium text-slate-400">
+                    AI Provider & Model
+                  </label>
                   <p className="text-sm text-slate-200">
                     <span className="capitalize">{data?.ai.provider ?? 'OpenAI'}</span>
-                    <span className="ml-2 text-xs text-slate-400">({data?.ai.model ?? 'gpt-4o'})</span>
+                    <span className="ml-2 text-xs text-slate-400">
+                      ({data?.ai.model ?? 'gpt-4o'})
+                    </span>
                   </p>
                 </div>
               </div>
@@ -283,8 +294,10 @@ export default function SettingsPage() {
                 <div className="flex-1">
                   <label className="block text-xs font-medium text-slate-400">MCP Server</label>
                   <div className="mt-0.5 flex items-center gap-2">
-                    <p className="font-mono text-sm text-slate-200">{data?.mcp.url ?? 'http://localhost:3001'}</p>
-                    <span className="inline-flex items-center rounded-full border border-cyan-500/20 bg-cyan-500/10 px-2 py-0.2 text-[10px] text-cyan-300">
+                    <p className="font-mono text-sm text-slate-200">
+                      {data?.mcp.url ?? 'http://localhost:3001'}
+                    </p>
+                    <span className="py-0.2 inline-flex items-center rounded-full border border-cyan-500/20 bg-cyan-500/10 px-2 text-[10px] text-cyan-300">
                       Active
                     </span>
                   </div>
@@ -292,17 +305,19 @@ export default function SettingsPage() {
               </div>
 
               {/* Sign out */}
-              <div className="pt-4 border-t border-white/8 flex items-center justify-between">
+              <div className="border-white/8 flex items-center justify-between border-t pt-4">
                 <div>
                   <p className="text-xs font-medium text-slate-300">Sign Out</p>
-                  <p className="text-[11px] text-slate-500">Sign out of your active LifeOS session</p>
+                  <p className="text-[11px] text-slate-500">
+                    Sign out of your active LifeOS session
+                  </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => {
                     void signOut({ callbackUrl: '/' });
                   }}
-                  className="rounded-lg border border-red-500/30 bg-red-500/10 px-3.5 py-1.5 text-xs font-medium text-red-300 hover:bg-red-500/20 transition-colors"
+                  className="rounded-lg border border-red-500/30 bg-red-500/10 px-3.5 py-1.5 text-xs font-medium text-red-300 transition-colors hover:bg-red-500/20"
                 >
                   Sign Out
                 </button>

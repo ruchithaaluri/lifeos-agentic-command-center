@@ -94,15 +94,19 @@ export async function POST(req: NextRequest) {
               },
             });
           } else if (event.type === 'session_complete') {
-            await prisma.agentSession.update({
-              where: { id: sessionId },
-              data: { status: 'completed' },
-            }).catch(() => {});
+            await prisma.agentSession
+              .update({
+                where: { id: sessionId },
+                data: { status: 'completed' },
+              })
+              .catch(() => {});
           } else if (event.type === 'session_error') {
-            await prisma.agentSession.update({
-              where: { id: sessionId },
-              data: { status: 'failed' },
-            }).catch(() => {});
+            await prisma.agentSession
+              .update({
+                where: { id: sessionId },
+                data: { status: 'failed' },
+              })
+              .catch(() => {});
           }
         } catch {
           /* non-fatal */
@@ -126,21 +130,23 @@ export async function POST(req: NextRequest) {
         try {
           if (execution?.results && Array.isArray(execution.results)) {
             for (const r of execution.results) {
-              await prisma.agentAction.create({
-                data: {
-                  sessionId,
-                  tool: r.type,
-                  input: {},
-                  output: { id: r.id, status: r.status },
-                  status:
-                    r.status === 'success'
-                      ? 'success'
-                      : r.status === 'failed'
-                        ? 'failed'
-                        : 'pending',
-                  message: r.message,
-                },
-              }).catch(() => {});
+              await prisma.agentAction
+                .create({
+                  data: {
+                    sessionId,
+                    tool: r.type,
+                    input: {},
+                    output: { id: r.id, status: r.status },
+                    status:
+                      r.status === 'success'
+                        ? 'success'
+                        : r.status === 'failed'
+                          ? 'failed'
+                          : 'pending',
+                    message: r.message,
+                  },
+                })
+                .catch(() => {});
             }
           }
 

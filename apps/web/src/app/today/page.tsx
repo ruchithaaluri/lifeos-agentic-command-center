@@ -1,7 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, CheckCircle2 } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Calendar as CalendarIcon,
+  Plus,
+  CheckCircle2,
+} from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { TaskCard } from '@/components/dashboard/TaskCard';
 import { EventCard } from '@/components/dashboard/EventCard';
@@ -31,7 +37,9 @@ export default function TodayPage() {
   const [showAddTask, setShowAddTask] = useState(false);
   const [showAddEvent, setShowAddEvent] = useState(false);
 
-  const { tasks, events, timezone, isLoading, refresh } = useDashboardData(selectedDate ?? undefined);
+  const { tasks, events, timezone, isLoading, refresh } = useDashboardData(
+    selectedDate ?? undefined,
+  );
   const { submit } = useAgent();
 
   const todayStr = getTodayInTimezone(timezone || 'America/Los_Angeles');
@@ -51,7 +59,9 @@ export default function TodayPage() {
           <div>
             <div className="flex items-center gap-2">
               <CalendarIcon className="h-5 w-5 text-blue-400" aria-hidden />
-              <h1 className="text-2xl font-bold text-white">{isToday ? 'Today' : 'Daily Schedule'}</h1>
+              <h1 className="text-2xl font-bold text-white">
+                {isToday ? 'Today' : 'Daily Schedule'}
+              </h1>
             </div>
             <p className="mt-1 text-sm text-slate-400">{formatDate(displayDate, timezone)}</p>
           </div>

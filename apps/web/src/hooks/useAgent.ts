@@ -113,7 +113,10 @@ export function useAgent() {
         dashStore.setTasks(data.tasks);
       }
       if (eventsRes.ok) {
-        const data = (await eventsRes.json()) as { events: typeof dashStore.events; timezone?: string };
+        const data = (await eventsRes.json()) as {
+          events: typeof dashStore.events;
+          timezone?: string;
+        };
         dashStore.setEvents(data.events);
         if (data.timezone) {
           dashStore.setTimezone(data.timezone);

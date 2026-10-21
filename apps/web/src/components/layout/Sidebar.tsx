@@ -92,7 +92,9 @@ export function Sidebar() {
           </div>
           <div className="hidden min-w-0 flex-1 lg:block">
             <p className="truncate text-xs font-medium text-slate-200">{displayName}</p>
-            <p className="truncate text-xs text-slate-500">{isDemo ? 'Demo workspace' : 'Workspace'}</p>
+            <p className="truncate text-xs text-slate-500">
+              {isDemo ? 'Demo workspace' : 'Workspace'}
+            </p>
           </div>
           {status === 'authenticated' && (
             <button

@@ -195,7 +195,7 @@ function AuthScreenInner({ initialMode = 'signin' }: { initialMode?: AuthMode })
     'w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 transition-colors focus:border-indigo-400/60 focus:bg-white/[0.06] focus:outline-none';
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-navy-950 px-4 py-12">
+    <main className="bg-navy-950 flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
         <Link
           href="/"
@@ -258,7 +258,7 @@ function AuthScreenInner({ initialMode = 'signin' }: { initialMode?: AuthMode })
 function AuthFallback() {
   return (
     <main
-      className="flex min-h-screen items-center justify-center bg-navy-950 px-4"
+      className="bg-navy-950 flex min-h-screen items-center justify-center px-4"
       aria-busy="true"
     >
       <p className="flex items-center gap-2 text-sm text-slate-500">

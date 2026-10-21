@@ -78,7 +78,7 @@ function ToolIcon({ status }: { status: AgentActionUI['status'] }) {
 
 function PlanItemCard({ item, timezone }: { item: PlanItem; timezone?: string }) {
   return (
-    <div className="border-white/8 bg-white/5 flex items-start gap-3 rounded-lg border p-2.5 transition-colors hover:bg-white/[0.08]">
+    <div className="border-white/8 flex items-start gap-3 rounded-lg border bg-white/5 p-2.5 transition-colors hover:bg-white/[0.08]">
       <div
         className={cn(
           'mt-1 h-2 w-2 shrink-0 rounded-full',
@@ -94,9 +94,15 @@ function PlanItemCard({ item, timezone }: { item: PlanItem; timezone?: string })
       <div className="min-w-0 flex-1">
         <p className="text-xs font-medium text-slate-100">{item.title}</p>
         <div className="mt-1 flex flex-wrap items-center gap-2">
-          <span className="text-[11px] text-slate-400 font-mono">{formatTime(item.startTime, timezone)}</span>
-          <span className="text-[11px] text-slate-500 font-mono">· {durationLabel(item.durationMinutes)}</span>
-          {item.reason && <span className="truncate text-[11px] text-slate-400 italic">({item.reason})</span>}
+          <span className="font-mono text-[11px] text-slate-400">
+            {formatTime(item.startTime, timezone)}
+          </span>
+          <span className="font-mono text-[11px] text-slate-500">
+            · {durationLabel(item.durationMinutes)}
+          </span>
+          {item.reason && (
+            <span className="truncate text-[11px] italic text-slate-400">({item.reason})</span>
+          )}
         </div>
       </div>
     </div>
@@ -245,13 +251,13 @@ export default function AlexaPage() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="hidden items-center gap-2 text-xs text-slate-400 md:flex">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
               <span>MCP Server Active (:3001)</span>
             </div>
 
             <Link
               href="/activity"
-              className="hidden rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300 transition-colors hover:bg-white/10 sm:inline-flex items-center gap-1.5"
+              className="hidden items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300 transition-colors hover:bg-white/10 sm:inline-flex"
             >
               Activity Logs
               <ExternalLink className="h-3 w-3 text-slate-400" />
@@ -273,20 +279,20 @@ export default function AlexaPage() {
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col p-4 sm:p-6 lg:h-[calc(100vh-65px)]">
         <div className="grid flex-1 gap-6 lg:grid-cols-12 lg:overflow-hidden">
           {/* Left Column — Conversation & Voice simulator (8 cols on lg) */}
-          <div className="flex flex-col rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl lg:col-span-8 lg:overflow-hidden shadow-2xl">
+          <div className="flex flex-col rounded-2xl border border-white/10 bg-slate-900/40 shadow-2xl backdrop-blur-xl lg:col-span-8 lg:overflow-hidden">
             {/* Top Phase Header Bar */}
-            <div className="border-b border-white/8 bg-white/[0.02] px-4 py-2.5">
+            <div className="border-white/8 border-b bg-white/[0.02] px-4 py-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Simulation Channel
                 </span>
                 {isRunning ? (
-                  <div className="flex items-center gap-1.5 text-xs text-blue-400 font-medium">
+                  <div className="flex items-center gap-1.5 text-xs font-medium text-blue-400">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     <span>Agent in flight…</span>
                   </div>
                 ) : (
-                  <span className="text-[11px] text-slate-500 font-mono">
+                  <span className="font-mono text-[11px] text-slate-500">
                     Ready for voice or text prompt
                   </span>
                 )}
@@ -342,13 +348,14 @@ export default function AlexaPage() {
             <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-5">
               {messages.length === 0 && !isRunning && (
                 <div className="flex h-full flex-col items-center justify-center py-10 text-center">
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-500/20 to-violet-500/20 shadow-glow">
+                  <div className="shadow-glow mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-500/20 to-violet-500/20">
                     <Sparkles className="h-7 w-7 text-blue-400" aria-hidden />
                   </div>
                   <h2 className="text-lg font-bold text-white">Alexa+ Conversational Companion</h2>
-                  <p className="mt-1.5 max-w-md text-xs text-slate-400 leading-relaxed">
+                  <p className="mt-1.5 max-w-md text-xs leading-relaxed text-slate-400">
                     Say or type requests like rescheduling, managing tasks, or planning your day.
-                    LifeOS coordinates MCP tools and executes actual PostgreSQL schedule changes in real-time.
+                    LifeOS coordinates MCP tools and executes actual PostgreSQL schedule changes in
+                    real-time.
                   </p>
 
                   <div className="mt-6 flex flex-col items-center gap-2">
@@ -360,7 +367,7 @@ export default function AlexaPage() {
                         <button
                           key={prompt}
                           onClick={() => handleSubmit(prompt)}
-                          className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300 transition-all hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-blue-200 active:scale-95 text-left"
+                          className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-left text-xs text-slate-300 transition-all hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-blue-200 active:scale-95"
                         >
                           &ldquo;{prompt}&rdquo;
                         </button>
@@ -377,7 +384,10 @@ export default function AlexaPage() {
                     key={msg.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={cn('flex flex-col', msg.role === 'user' ? 'items-end' : 'items-start')}
+                    className={cn(
+                      'flex flex-col',
+                      msg.role === 'user' ? 'items-end' : 'items-start',
+                    )}
                   >
                     <div
                       className={cn(
@@ -410,7 +420,7 @@ export default function AlexaPage() {
                       )}
 
                       {/* Main Message Text */}
-                      <p className="leading-relaxed font-normal">{msg.content}</p>
+                      <p className="font-normal leading-relaxed">{msg.content}</p>
 
                       {/* Error Banner with Recovery */}
                       {msg.error && (
@@ -422,7 +432,9 @@ export default function AlexaPage() {
                           <div className="mt-2.5 flex items-center gap-2">
                             <button
                               onClick={() => {
-                                const lastUser = [...messages].reverse().find((m) => m.role === 'user');
+                                const lastUser = [...messages]
+                                  .reverse()
+                                  .find((m) => m.role === 'user');
                                 if (lastUser) handleSubmit(lastUser.content);
                               }}
                               className="rounded bg-red-500/20 px-2.5 py-1 text-[11px] font-semibold text-red-200 transition-colors hover:bg-red-500/30"
@@ -444,11 +456,11 @@ export default function AlexaPage() {
                         <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-3">
                           <div className="mb-2 flex items-center justify-between text-xs">
                             <span className="font-semibold text-slate-300">Scheduled Agenda</span>
-                            <span className="text-[11px] text-blue-300 font-mono">
+                            <span className="font-mono text-[11px] text-blue-300">
                               {msg.planSnapshot.items.length} blocks
                             </span>
                           </div>
-                          <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                          <div className="max-h-48 space-y-1.5 overflow-y-auto pr-1">
                             {msg.planSnapshot.items.map((item) => (
                               <PlanItemCard key={item.id} item={item} timezone={timezone} />
                             ))}
@@ -463,9 +475,7 @@ export default function AlexaPage() {
                             onClick={() => toggleDetails(msg.id)}
                             className="flex items-center gap-1.5 text-[11px] font-medium text-slate-400 hover:text-slate-200"
                           >
-                            <span>
-                              {msg.actionsSnapshot.length} tool executions recorded
-                            </span>
+                            <span>{msg.actionsSnapshot.length} tool executions recorded</span>
                             {expandedDetailsId === msg.id ? (
                               <ChevronUp className="h-3 w-3" />
                             ) : (
@@ -480,14 +490,21 @@ export default function AlexaPage() {
                               className="mt-2 space-y-1 rounded-lg bg-black/30 p-2"
                             >
                               {msg.actionsSnapshot.map((a) => (
-                                <div key={a.id} className="flex items-center justify-between text-[11px] py-1 border-b border-white/5 last:border-0">
-                                  <div className="flex items-center gap-1.5 min-w-0 pr-2">
+                                <div
+                                  key={a.id}
+                                  className="flex items-center justify-between border-b border-white/5 py-1 text-[11px] last:border-0"
+                                >
+                                  <div className="flex min-w-0 items-center gap-1.5 pr-2">
                                     <ToolIcon status={a.status} />
-                                    <span className="truncate text-slate-300 font-mono">{a.tool}</span>
+                                    <span className="truncate font-mono text-slate-300">
+                                      {a.tool}
+                                    </span>
                                     <span className="truncate text-slate-400">— {a.message}</span>
                                   </div>
                                   {a.latencyMs !== undefined && (
-                                    <span className="text-slate-500 font-mono shrink-0">{a.latencyMs}ms</span>
+                                    <span className="shrink-0 font-mono text-slate-500">
+                                      {a.latencyMs}ms
+                                    </span>
                                   )}
                                 </div>
                               ))}
@@ -497,7 +514,7 @@ export default function AlexaPage() {
                       )}
 
                       {/* Timestamp */}
-                      <div className="mt-2 text-right text-[10px] text-slate-400 font-mono opacity-60">
+                      <div className="mt-2 text-right font-mono text-[10px] text-slate-400 opacity-60">
                         {msg.timestamp.toLocaleTimeString('en-US', {
                           hour: 'numeric',
                           minute: '2-digit',
@@ -515,8 +532,8 @@ export default function AlexaPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className="flex flex-col items-start"
                 >
-                  <div className="max-w-xl rounded-2xl rounded-tl-xs border border-blue-500/30 bg-slate-800/90 p-4 text-sm shadow-lg backdrop-blur-md">
-                    <div className="flex items-center gap-2 text-xs font-semibold text-blue-300 mb-2">
+                  <div className="rounded-tl-xs max-w-xl rounded-2xl border border-blue-500/30 bg-slate-800/90 p-4 text-sm shadow-lg backdrop-blur-md">
+                    <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-blue-300">
                       <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-400" />
                       <span>LifeOS Agent Orchestrating…</span>
                     </div>
@@ -527,14 +544,14 @@ export default function AlexaPage() {
                           key={action.id}
                           className="flex items-center justify-between gap-2 rounded-lg bg-white/5 px-2.5 py-1.5 text-xs"
                         >
-                          <div className="flex items-center gap-2 min-w-0">
+                          <div className="flex min-w-0 items-center gap-2">
                             <ToolIcon status={action.status} />
-                            <span className="font-medium text-slate-200 truncate">
+                            <span className="truncate font-medium text-slate-200">
                               {action.message}
                             </span>
                           </div>
                           {action.latencyMs !== undefined && (
-                            <span className="text-[11px] font-mono text-slate-400 shrink-0">
+                            <span className="shrink-0 font-mono text-[11px] text-slate-400">
                               {action.latencyMs}ms
                             </span>
                           )}
@@ -549,7 +566,7 @@ export default function AlexaPage() {
             </div>
 
             {/* Input Form Bar */}
-            <div className="border-t border-white/8 bg-navy-950/80 p-3 sm:p-4">
+            <div className="border-white/8 bg-navy-950/80 border-t p-3 sm:p-4">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -596,7 +613,7 @@ export default function AlexaPage() {
                   className={cn(
                     'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-all',
                     input.trim() && !isRunning
-                      ? 'bg-blue-600 text-white shadow-glow hover:bg-blue-500 active:scale-95'
+                      ? 'shadow-glow bg-blue-600 text-white hover:bg-blue-500 active:scale-95'
                       : 'cursor-not-allowed bg-white/5 text-slate-600',
                   )}
                 >
@@ -605,9 +622,11 @@ export default function AlexaPage() {
               </form>
 
               {/* Disclaimer footer */}
-              <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <div className="mt-2 flex items-center justify-between px-1 text-[11px] text-slate-400">
                 <span>Alexa+ Track Simulator · Press Enter to send</span>
-                <span className="font-mono text-slate-400">Session: {sessionId ? sessionId.slice(0, 8) : 'demo-ready'}</span>
+                <span className="font-mono text-slate-400">
+                  Session: {sessionId ? sessionId.slice(0, 8) : 'demo-ready'}
+                </span>
               </div>
             </div>
           </div>
@@ -619,9 +638,9 @@ export default function AlexaPage() {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 backdrop-blur-md shadow-xl"
+                className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 shadow-xl backdrop-blur-md"
               >
-                <div className="mb-3 flex items-center justify-between border-b border-white/8 pb-2">
+                <div className="border-white/8 mb-3 flex items-center justify-between border-b pb-2">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-violet-400" />
                     <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
@@ -632,8 +651,8 @@ export default function AlexaPage() {
                     {currentPlan.items.length} blocks
                   </Badge>
                 </div>
-                <p className="mb-3 text-xs text-slate-400 font-medium">{currentPlan.goal}</p>
-                <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                <p className="mb-3 text-xs font-medium text-slate-400">{currentPlan.goal}</p>
+                <div className="max-h-60 space-y-2 overflow-y-auto pr-1">
                   {currentPlan.items.map((item) => (
                     <PlanItemCard key={item.id} item={item} timezone={timezone} />
                   ))}
@@ -642,15 +661,15 @@ export default function AlexaPage() {
             )}
 
             {/* Live Today's Schedule Card */}
-            <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 backdrop-blur-md shadow-xl">
-              <div className="mb-3 flex items-center justify-between border-b border-white/8 pb-2">
+            <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 shadow-xl backdrop-blur-md">
+              <div className="border-white/8 mb-3 flex items-center justify-between border-b pb-2">
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-blue-400" />
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
                     Today&apos;s Calendar
                   </h3>
                 </div>
-                <span className="text-[11px] text-slate-400 font-mono">
+                <span className="font-mono text-[11px] text-slate-400">
                   {events.length} event{events.length !== 1 ? 's' : ''}
                 </span>
               </div>
@@ -663,22 +682,22 @@ export default function AlexaPage() {
               ) : events.length === 0 ? (
                 <p className="py-4 text-center text-xs text-slate-400">No events today</p>
               ) : (
-                <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
                   {events.map((evt) => (
                     <div
                       key={evt.id}
                       className="rounded-lg border border-white/5 bg-white/[0.03] p-2.5 transition-colors hover:bg-white/[0.06]"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-slate-200 truncate pr-2">
+                        <span className="truncate pr-2 text-xs font-medium text-slate-200">
                           {evt.title}
                         </span>
-                        <span className="text-[11px] font-mono text-blue-400 shrink-0">
+                        <span className="shrink-0 font-mono text-[11px] text-blue-400">
                           {formatTime(evt.start, timezone)}
                         </span>
                       </div>
                       {evt.location && (
-                        <p className="mt-0.5 text-[10px] text-slate-400 truncate">{evt.location}</p>
+                        <p className="mt-0.5 truncate text-[10px] text-slate-400">{evt.location}</p>
                       )}
                     </div>
                   ))}
@@ -687,8 +706,8 @@ export default function AlexaPage() {
             </div>
 
             {/* Tasks Summary Card */}
-            <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 backdrop-blur-md shadow-xl">
-              <div className="mb-3 flex items-center justify-between border-b border-white/8 pb-2">
+            <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 shadow-xl backdrop-blur-md">
+              <div className="border-white/8 mb-3 flex items-center justify-between border-b pb-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
@@ -697,7 +716,7 @@ export default function AlexaPage() {
                 </div>
                 <Link
                   href="/tasks"
-                  className="text-[11px] text-blue-400 hover:underline flex items-center gap-1"
+                  className="flex items-center gap-1 text-[11px] text-blue-400 hover:underline"
                 >
                   View all
                 </Link>
@@ -708,17 +727,18 @@ export default function AlexaPage() {
                   <span className="text-xl font-bold text-white">
                     {tasks.filter((t) => t.status !== 'completed').length}
                   </span>
-                  <p className="text-[10px] text-slate-400 uppercase tracking-wider mt-0.5">
+                  <p className="mt-0.5 text-[10px] uppercase tracking-wider text-slate-400">
                     Total Open
                   </p>
                 </div>
                 <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-2.5">
                   <span className="text-xl font-bold text-red-400">
-                    {tasks.filter((t) => t.priority === 'urgent' && t.status !== 'completed').length}
+                    {
+                      tasks.filter((t) => t.priority === 'urgent' && t.status !== 'completed')
+                        .length
+                    }
                   </span>
-                  <p className="text-[10px] text-red-300 uppercase tracking-wider mt-0.5">
-                    Urgent
-                  </p>
+                  <p className="mt-0.5 text-[10px] uppercase tracking-wider text-red-300">Urgent</p>
                 </div>
               </div>
             </div>

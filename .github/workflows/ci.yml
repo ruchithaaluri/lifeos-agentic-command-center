@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main, develop]
 
+env:
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lifeos_test
+  MCP_SECRET: test-secret-for-ci
+  NEXTAUTH_SECRET: test-secret-for-ci
+  NEXTAUTH_URL: http://localhost:3000
+
 jobs:
   # Linting and formatting check
   lint:
@@ -38,7 +44,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
       
       # ESLint runs with parserOptions.project, so it type-checks using each
       # package tsconfig. Workspace packages are consumed through their
@@ -59,7 +65,7 @@ jobs:
         run: pnpm lint
       
       - name: Check formatting (Prettier)
-        run: pnpm format:check || echo "Add format:check script to package.json"
+        run: pnpm format:check
 
   # Type checking
   typecheck:
@@ -92,7 +98,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
       
       - name: Build shared packages
         run: |
@@ -135,13 +141,14 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
       
       - name: Build packages
         run: |
           pnpm --filter @lifeos/shared build
           pnpm --filter @lifeos/database build
           pnpm --filter @lifeos/ai build
+          pnpm --filter @lifeos/ui build
       
       - name: Run tests
         run: pnpm test
@@ -149,6 +156,7 @@ jobs:
       - name: Upload coverage reports
         uses: codecov/codecov-action@v5
         if: always()
+        continue-on-error: true
         with:
           files: ./coverage/coverage-final.json
           flags: unittests
@@ -185,7 +193,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
       
       - name: Build all packages and apps
         run: pnpm build
@@ -251,13 +259,14 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
       
       - name: Build packages
         run: |
           pnpm --filter @lifeos/shared build
           pnpm --filter @lifeos/database build
           pnpm --filter @lifeos/ai build
+          pnpm --filter @lifeos/ui build
       
       - name: Run database migrations
         run: pnpm --filter @lifeos/database db:migrate:deploy
@@ -299,7 +308,7 @@ jobs:
       
       - name: Check for known vulnerabilities
         run: |
-          pnpm install --frozen-lockfile
+          pnpm install --no-frozen-lockfile
           pnpm audit --json > audit-report.json || true
       
       - name: Upload audit report

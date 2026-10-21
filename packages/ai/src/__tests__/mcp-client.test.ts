@@ -58,7 +58,9 @@ function startServer(
       const out = respond();
       if (!out) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ jsonrpc: '2.0', error: { code: -32600, message: 'Bad Request' } }));
+        res.end(
+          JSON.stringify({ jsonrpc: '2.0', error: { code: -32600, message: 'Bad Request' } }),
+        );
         return;
       }
       // Default transport behaviour: SSE-framed response.
@@ -95,52 +97,51 @@ describe('MCPClient.callTool', () => {
     server.close();
   });
 
+  describe('MCPClient.callTool error handling', () => {
+    it('reports a JSON-RPC error as a failure', async () => {
+      const s = await startServer(() => ({
+        payload: { error: { code: -32602, message: 'Invalid arguments' } },
+      }));
+      const client = new MCPClient({ serverUrl: s.url, secret: SECRET });
+      const result = await client.callTool({ tool: 'create_task', input: {} });
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Invalid arguments');
+      s.server.close();
+    });
 
-describe('MCPClient.callTool error handling', () => {
-  it('reports a JSON-RPC error as a failure', async () => {
-    const s = await startServer(() => ({
-      payload: { error: { code: -32602, message: 'Invalid arguments' } },
-    }));
-    const client = new MCPClient({ serverUrl: s.url, secret: SECRET });
-    const result = await client.callTool({ tool: 'create_task', input: {} });
-    expect(result.success).toBe(false);
-    expect(result.error).toContain('Invalid arguments');
-    s.server.close();
-  });
-
-  it('reports an in-band tool error (isError) as a failure', async () => {
-    const s = await startServer(() => ({
-      payload: {
-        result: {
-          content: [{ type: 'text', text: 'Event end time must be after start time.' }],
-          isError: true,
+    it('reports an in-band tool error (isError) as a failure', async () => {
+      const s = await startServer(() => ({
+        payload: {
+          result: {
+            content: [{ type: 'text', text: 'Event end time must be after start time.' }],
+            isError: true,
+          },
         },
-      },
-    }));
-    const client = new MCPClient({ serverUrl: s.url, secret: SECRET });
-    const result = await client.callTool({ tool: 'create_event', input: {} });
-    expect(result.success).toBe(false);
-    expect(result.error).toContain('end time must be after start');
-    s.server.close();
-  });
+      }));
+      const client = new MCPClient({ serverUrl: s.url, secret: SECRET });
+      const result = await client.callTool({ tool: 'create_event', input: {} });
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('end time must be after start');
+      s.server.close();
+    });
 
-  it('is not rejected with 406 when talking to a spec-compliant server', async () => {
-    // The stub answers 406 whenever the Accept header is incomplete, exactly
-    // as the MCP Streamable HTTP transport does.
-    const s = await startServer(() => null);
-    const client = new MCPClient({ serverUrl: s.url, secret: SECRET });
-    const result = await client.callTool({ tool: 'get_tasks', input: {} });
-    expect(result.error ?? '').not.toContain('406');
-    s.server.close();
-  });
+    it('is not rejected with 406 when talking to a spec-compliant server', async () => {
+      // The stub answers 406 whenever the Accept header is incomplete, exactly
+      // as the MCP Streamable HTTP transport does.
+      const s = await startServer(() => null);
+      const client = new MCPClient({ serverUrl: s.url, secret: SECRET });
+      const result = await client.callTool({ tool: 'get_tasks', input: {} });
+      expect(result.error ?? '').not.toContain('406');
+      s.server.close();
+    });
 
-  it('returns a failure when the server is unreachable', async () => {
-    const client = new MCPClient({ serverUrl: 'http://127.0.0.1:19998', secret: SECRET });
-    const result = await client.callTool({ tool: 'get_tasks', input: {} });
-    expect(result.success).toBe(false);
-    expect(result.error).toBeTruthy();
+    it('returns a failure when the server is unreachable', async () => {
+      const client = new MCPClient({ serverUrl: 'http://127.0.0.1:19998', secret: SECRET });
+      const result = await client.callTool({ tool: 'get_tasks', input: {} });
+      expect(result.success).toBe(false);
+      expect(result.error).toBeTruthy();
+    });
   });
-});
 
   it('advertises both acceptable content types', async () => {
     const client = new MCPClient({ serverUrl: url, secret: SECRET });

@@ -74,8 +74,5 @@ export async function POST(req: Request) {
 
   const user = await createUserWithPassword(parsed.data);
 
-  return NextResponse.json(
-    { id: user.id, email: user.email, name: user.name },
-    { status: 201 },
-  );
+  return NextResponse.json({ id: user.id, email: user.email, name: user.name }, { status: 201 });
 }

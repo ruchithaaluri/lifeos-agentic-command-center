@@ -38,7 +38,7 @@ export default function TasksPage() {
           <button
             type="button"
             onClick={() => setShowAddTask(true)}
-            className="flex items-center gap-2 rounded-xl bg-blue-500 px-4 py-2.5 text-xs font-semibold text-white shadow-glow hover:bg-blue-400 transition-all self-start sm:self-auto"
+            className="shadow-glow flex items-center gap-2 self-start rounded-xl bg-blue-500 px-4 py-2.5 text-xs font-semibold text-white transition-all hover:bg-blue-400 sm:self-auto"
           >
             <Plus className="h-4 w-4" />
             <span>Add Task</span>
@@ -83,7 +83,10 @@ export default function TasksPage() {
             {grouped.completed.length > 0 && (
               <section aria-labelledby="completed-heading">
                 <div className="mb-3 flex items-center gap-2">
-                  <h2 id="completed-heading" className="text-sm font-semibold capitalize text-slate-400">
+                  <h2
+                    id="completed-heading"
+                    className="text-sm font-semibold capitalize text-slate-400"
+                  >
                     Completed
                   </h2>
                   <Badge variant="muted">{grouped.completed.length}</Badge>
@@ -111,7 +114,7 @@ export default function TasksPage() {
                 <button
                   type="button"
                   onClick={() => setShowAddTask(true)}
-                  className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-blue-500/20 px-4 py-2 text-xs font-semibold text-blue-300 hover:bg-blue-500/30 transition-colors"
+                  className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-blue-500/20 px-4 py-2 text-xs font-semibold text-blue-300 transition-colors hover:bg-blue-500/30"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Create First Task

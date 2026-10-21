@@ -192,9 +192,7 @@ export default function DashboardPage() {
                   className="flex items-center gap-2 text-sm font-semibold text-slate-300"
                 >
                   {isToday ? "Today's Schedule" : `Schedule (${formatDate(displayDate, timezone)})`}
-                  <span className="text-xs font-normal text-slate-600">
-                    {events.length} events
-                  </span>
+                  <span className="text-xs font-normal text-slate-600">{events.length} events</span>
                 </h2>
                 <div className="flex items-center gap-2">
                   <button

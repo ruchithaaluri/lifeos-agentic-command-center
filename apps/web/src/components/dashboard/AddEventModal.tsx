@@ -59,7 +59,9 @@ export function AddEventModal({ isOpen, onClose, defaultDate, onSuccess }: AddEv
       });
 
       if (!res.ok) {
-        const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+        const body = (await res.json().catch(() => null)) as {
+          error?: { message?: string };
+        } | null;
         setError(body?.error?.message ?? 'Failed to create event.');
         return;
       }
@@ -89,10 +91,10 @@ export function AddEventModal({ isOpen, onClose, defaultDate, onSuccess }: AddEv
       onClick={onClose}
     >
       <div
-        className="glass relative w-full max-w-lg rounded-2xl border border-white/10 bg-navy-900/95 p-6 shadow-2xl"
+        className="glass bg-navy-900/95 relative w-full max-w-lg rounded-2xl border border-white/10 p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-5 flex items-center justify-between border-b border-white/8 pb-4">
+        <div className="border-white/8 mb-5 flex items-center justify-between border-b pb-4">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/20 text-violet-400">
               <CalendarIcon className="h-4 w-4" />
@@ -107,7 +109,7 @@ export function AddEventModal({ isOpen, onClose, defaultDate, onSuccess }: AddEv
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+            className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
             aria-label="Close modal"
           >
             <X className="h-4 w-4" />
@@ -127,7 +129,10 @@ export function AddEventModal({ isOpen, onClose, defaultDate, onSuccess }: AddEv
           className="space-y-4"
         >
           <div>
-            <label htmlFor="event-title-input" className="mb-1 block text-xs font-medium text-slate-300">
+            <label
+              htmlFor="event-title-input"
+              className="mb-1 block text-xs font-medium text-slate-300"
+            >
               Title <span className="text-red-400">*</span>
             </label>
             <input
@@ -144,36 +149,51 @@ export function AddEventModal({ isOpen, onClose, defaultDate, onSuccess }: AddEv
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div>
-              <label htmlFor="event-date-input" className="mb-1 block text-xs font-medium text-slate-300">Date</label>
+              <label
+                htmlFor="event-date-input"
+                className="mb-1 block text-xs font-medium text-slate-300"
+              >
+                Date
+              </label>
               <input
                 id="event-date-input"
                 type="date"
                 required
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white focus:border-violet-500 focus:outline-none [color-scheme:dark]"
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white [color-scheme:dark] focus:border-violet-500 focus:outline-none"
               />
             </div>
             <div>
-              <label htmlFor="event-start-input" className="mb-1 block text-xs font-medium text-slate-300">Start Time</label>
+              <label
+                htmlFor="event-start-input"
+                className="mb-1 block text-xs font-medium text-slate-300"
+              >
+                Start Time
+              </label>
               <input
                 id="event-start-input"
                 type="time"
                 required
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white focus:border-violet-500 focus:outline-none [color-scheme:dark]"
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white [color-scheme:dark] focus:border-violet-500 focus:outline-none"
               />
             </div>
             <div>
-              <label htmlFor="event-end-input" className="mb-1 block text-xs font-medium text-slate-300">End Time</label>
+              <label
+                htmlFor="event-end-input"
+                className="mb-1 block text-xs font-medium text-slate-300"
+              >
+                End Time
+              </label>
               <input
                 id="event-end-input"
                 type="time"
                 required
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white focus:border-violet-500 focus:outline-none [color-scheme:dark]"
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white [color-scheme:dark] focus:border-violet-500 focus:outline-none"
               />
             </div>
           </div>
@@ -195,7 +215,7 @@ export function AddEventModal({ isOpen, onClose, defaultDate, onSuccess }: AddEv
                   onClick={() => setType(t.id)}
                   className={`rounded-lg border px-2 py-1.5 text-xs font-medium transition-all ${
                     type === t.id
-                      ? 'border-violet-500/50 bg-violet-500/20 text-violet-300 font-semibold'
+                      ? 'border-violet-500/50 bg-violet-500/20 font-semibold text-violet-300'
                       : 'border-white/10 bg-white/5 text-slate-400 hover:border-white/20'
                   }`}
                 >
@@ -206,7 +226,10 @@ export function AddEventModal({ isOpen, onClose, defaultDate, onSuccess }: AddEv
           </div>
 
           <div>
-            <label htmlFor="event-loc-input" className="mb-1 flex items-center gap-1.5 text-xs font-medium text-slate-300">
+            <label
+              htmlFor="event-loc-input"
+              className="mb-1 flex items-center gap-1.5 text-xs font-medium text-slate-300"
+            >
               <MapPin className="h-3.5 w-3.5 text-slate-400" />
               Location / Link (Optional)
             </label>
@@ -220,19 +243,19 @@ export function AddEventModal({ isOpen, onClose, defaultDate, onSuccess }: AddEv
             />
           </div>
 
-          <div className="mt-6 flex items-center justify-end gap-2.5 border-t border-white/8 pt-4">
+          <div className="border-white/8 mt-6 flex items-center justify-end gap-2.5 border-t pt-4">
             <button
               type="button"
               onClick={onClose}
               disabled={busy}
-              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-white/10 transition-colors"
+              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300 transition-colors hover:bg-white/10"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={busy}
-              className="flex items-center gap-1.5 rounded-lg bg-violet-600 px-4 py-2 text-xs font-semibold text-white shadow-glow hover:bg-violet-500 transition-all disabled:opacity-50"
+              className="shadow-glow flex items-center gap-1.5 rounded-lg bg-violet-600 px-4 py-2 text-xs font-semibold text-white transition-all hover:bg-violet-500 disabled:opacity-50"
             >
               {busy ? (
                 <>

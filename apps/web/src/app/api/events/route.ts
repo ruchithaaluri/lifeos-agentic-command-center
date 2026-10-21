@@ -241,7 +241,9 @@ export async function PATCH(req: NextRequest) {
 
     if (newEnd <= newStart) {
       return NextResponse.json(
-        { error: { code: 'VALIDATION_ERROR', message: 'Event end time must be after start time.' } },
+        {
+          error: { code: 'VALIDATION_ERROR', message: 'Event end time must be after start time.' },
+        },
         { status: 400 },
       );
     }

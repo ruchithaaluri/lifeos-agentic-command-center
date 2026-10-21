@@ -28,17 +28,17 @@ async function generatePlanInputFor(goal: string): Promise<Record<string, unknow
     const data: Record<string, unknown> =
       call.tool === 'generate_plan'
         ? {
-          plan: {
-            id: 'plan-1',
-            goal,
-            items: [],
-            summary: '',
-            generatedAt: new Date().toISOString(),
-            validForDate: new Date().toISOString().slice(0, 10),
-          },
-          reasoning: '',
-          changesRequired: [],
-        }
+            plan: {
+              id: 'plan-1',
+              goal,
+              items: [],
+              summary: '',
+              generatedAt: new Date().toISOString(),
+              validForDate: new Date().toISOString().slice(0, 10),
+            },
+            reasoning: '',
+            changesRequired: [],
+          }
         : {};
     return Promise.resolve({ tool: call.tool, success: true, data });
   };

@@ -113,9 +113,7 @@ export const useAgentStore = create<AgentState>((set) => ({
       isRunning: false,
       lastSummary: summary,
       actions: state.actions.map((a) =>
-        a.status === 'running' || a.status === 'pending'
-          ? { ...a, status: 'success' as const }
-          : a,
+        a.status === 'running' || a.status === 'pending' ? { ...a, status: 'success' as const } : a,
       ),
     })),
 
@@ -124,9 +122,7 @@ export const useAgentStore = create<AgentState>((set) => ({
       isRunning: false,
       error,
       actions: state.actions.map((a) =>
-        a.status === 'running' || a.status === 'pending'
-          ? { ...a, status: 'failed' as const }
-          : a,
+        a.status === 'running' || a.status === 'pending' ? { ...a, status: 'failed' as const } : a,
       ),
     })),
 
