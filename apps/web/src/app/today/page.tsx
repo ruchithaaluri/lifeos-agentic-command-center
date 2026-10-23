@@ -195,7 +195,13 @@ export default function TodayPage() {
 
             <div className="space-y-2">
               {events.map((e) => (
-                <EventCard key={e.id} event={e} />
+                <EventCard
+                  key={e.id}
+                  event={e}
+                  onRefresh={() => {
+                    void refresh();
+                  }}
+                />
               ))}
               {events.length === 0 && !isLoading && (
                 <div className="rounded-xl border border-dashed border-white/10 p-6 text-center text-slate-500">

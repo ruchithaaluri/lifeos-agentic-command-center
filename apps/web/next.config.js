@@ -2,6 +2,20 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@lifeos/shared', '@lifeos/database', '@lifeos/ai'],
+  async redirects() {
+    return [
+      {
+        source: '/auth/signin',
+        destination: '/signin',
+        permanent: true,
+      },
+      {
+        source: '/auth/signup',
+        destination: '/signup',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

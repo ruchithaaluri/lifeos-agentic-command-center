@@ -26,10 +26,26 @@ async function run() {
   }
 
   const pidFile = path.join(dbDir, 'postmaster.pid');
-  const isRunning = fs.existsSync(pidFile);
-  if (isRunning) {
-    console.log('PostgreSQL is already running on port 5432 (postmaster.pid detected).');
-  } else {
+  let isRunning = false;
+  if (fs.existsSync(pidFile)) {
+    try {
+      const pidContent = fs.readFileSync(pidFile, 'utf8');
+      const firstLine = pidContent.split('\n')[0].trim();
+      const pid = parseInt(firstLine, 10);
+      if (!isNaN(pid)) {
+        process.kill(pid, 0);
+        isRunning = true;
+        console.log(`PostgreSQL is already running on port 5432 (PID ${pid} detected).`);
+      }
+    } catch (e) {
+      console.log('Stale postmaster.pid detected, removing stale lock before starting...');
+      try {
+        fs.unlinkSync(pidFile);
+      } catch (err) {}
+    }
+  }
+
+  if (!isRunning) {
     console.log('Starting PostgreSQL on port 5432...');
     try {
       await pg.start();

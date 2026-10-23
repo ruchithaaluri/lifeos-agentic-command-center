@@ -231,7 +231,13 @@ export default function DashboardPage() {
               </div>
               <div className="space-y-2">
                 {events.map((event) => (
-                  <EventCard key={event.id} event={event} />
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    onRefresh={() => {
+                      void refresh();
+                    }}
+                  />
                 ))}
                 {events.length === 0 && !isLoading && (
                   <div className="rounded-xl border border-dashed border-white/10 p-6 text-center text-slate-500">
